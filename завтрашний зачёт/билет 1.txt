@@ -1,0 +1,151 @@
+Билет №1
+1.	Разработать структуру базы данных учебной нагрузки преподавателей в СУБД MySQL;
+2.	Разработать структуру базы данных учебной нагрузки преподавателей в СУБД PostgreSQL;
+3.	Заполнить таблицы тестовым набором данных.
+
+
+111111111111111111111111111111111111.
+-- Создание базы данных
+CREATE DATABASE IF NOT EXISTS teacher_workload;
+
+-- Использование базы данных
+USE teacher_workload;
+
+-- Таблица: Преподаватели (Teachers)
+CREATE TABLE Teachers (
+    TeacherID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    MiddleName VARCHAR(255),
+    Position VARCHAR(255), -- Должность
+    Department VARCHAR(255) -- Кафедра
+);
+
+-- Таблица: Дисциплины (Subjects)
+CREATE TABLE Subjects (
+    SubjectID INT PRIMARY KEY AUTO_INCREMENT,
+    SubjectName VARCHAR(255) NOT NULL,
+    Credits INT, -- Количество кредитов/зачетных единиц
+    Description TEXT
+);
+
+-- Таблица: Группы (Groups)
+CREATE TABLE Groups (
+    GroupID INT PRIMARY KEY AUTO_INCREMENT,
+    GroupName VARCHAR(50) NOT NULL,
+    Specialty VARCHAR(255), -- Специальность
+    Course INT -- Курс
+);
+
+-- Таблица: Учебные планы (Curricula)
+CREATE TABLE Curricula (
+    CurriculumID INT PRIMARY KEY AUTO_INCREMENT,
+    GroupID INT NOT NULL,
+    SubjectID INT NOT NULL,
+    Semester INT, -- Семестр
+    Hours INT, -- Общее количество часов по предмету для данной группы
+    LectureHours INT, -- Количество лекционных часов
+    PracticalHours INT, -- Количество практических/семинарских часов
+    LabHours INT, -- Количество лабораторных часов
+    ControlType VARCHAR(50), -- Форма контроля (экзамен, зачет, курсовая)
+    FOREIGN KEY (GroupID) REFERENCES Groups(GroupID),
+    FOREIGN KEY (SubjectID) REFERENCES Subjects(SubjectID)
+);
+
+-- Таблица: Нагрузка преподавателей (Workload)
+CREATE TABLE Workload (
+    WorkloadID INT PRIMARY KEY AUTO_INCREMENT,
+    TeacherID INT NOT NULL,
+    CurriculumID INT NOT NULL,
+    Year INT, -- Учебный год
+    FOREIGN KEY (TeacherID) REFERENCES Teachers(TeacherID),
+    FOREIGN KEY (CurriculumID) REFERENCES Curricula(CurriculumID)
+);
+22222222222222222222222222222222.
+-- Создание базы данных
+CREATE DATABASE teacher_workload;
+
+-- Подключение к базе данных
+\c teacher_workload
+
+-- Таблица: Преподаватели (Teachers)
+CREATE TABLE Teachers (
+    TeacherID SERIAL PRIMARY KEY,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    MiddleName VARCHAR(255),
+    Position VARCHAR(255), -- Должность
+    Department VARCHAR(255) -- Кафедра
+);
+
+-- Таблица: Дисциплины (Subjects)
+CREATE TABLE Subjects (
+    SubjectID SERIAL PRIMARY KEY,
+    SubjectName VARCHAR(255) NOT NULL,
+    Credits INT, -- Количество кредитов/зачетных единиц
+    Description TEXT
+);
+
+-- Таблица: Группы (Groups)
+CREATE TABLE Groups (
+    GroupID SERIAL PRIMARY KEY,
+    GroupName VARCHAR(50) NOT NULL,
+    Specialty VARCHAR(255), -- Специальность
+    Course INT -- Курс
+);
+
+-- Таблица: Учебные планы (Curricula)
+CREATE TABLE Curricula (
+    CurriculumID SERIAL PRIMARY KEY,
+    GroupID INT NOT NULL,
+    SubjectID INT NOT NULL,
+    Semester INT, -- Семестр
+    Hours INT, -- Общее количество часов по предмету для данной группы
+    LectureHours INT, -- Количество лекционных часов
+    PracticalHours INT, -- Количество практических/семинарских часов
+    LabHours INT, -- Количество лабораторных часов
+    ControlType VARCHAR(50), -- Форма контроля (экзамен, зачет, курсовая)
+    FOREIGN KEY (GroupID) REFERENCES Groups(GroupID),
+    FOREIGN KEY (SubjectID) REFERENCES Subjects(SubjectID)
+);
+
+-- Таблица: Нагрузка преподавателей (Workload)
+CREATE TABLE Workload (
+    WorkloadID SERIAL PRIMARY KEY,
+    TeacherID INT NOT NULL,
+    CurriculumID INT NOT NULL,
+    Year INT, -- Учебный год
+    FOREIGN KEY (TeacherID) REFERENCES Teachers(TeacherID),
+    FOREIGN KEY (CurriculumID) REFERENCES Curricula(CurriculumID)
+);
+
+3333333333333333333333333333333333333333333333333333333
+-- Заполнение таблицы Teachers
+INSERT INTO Teachers (FirstName, LastName, MiddleName, Position, Department) VALUES
+('Иван', 'Иванов', 'Иванович', 'Доцент', 'Информационные технологии'),
+('Петр', 'Петров', 'Петрович', 'Профессор', 'Математика'),
+('Анна', 'Сидорова', 'Сергеевна', 'Старший преподаватель', 'Физика');
+
+-- Заполнение таблицы Subjects
+INSERT INTO Subjects (SubjectName, Credits, Description) VALUES
+('Программирование', 5, 'Основы программирования на Python'),
+('Математический анализ', 4, 'Введение в математический анализ'),
+('Физика', 3, 'Общий курс физики');
+
+-- Заполнение таблицы Groups
+INSERT INTO Groups (GroupName, Specialty, Course) VALUES
+('ПИ-21', 'Прикладная информатика', 2),
+('М-11', 'Математика', 1),
+('Ф-31', 'Физика', 3);
+
+-- Заполнение таблицы Curricula
+INSERT INTO Curricula (GroupID, SubjectID, Semester, Hours, LectureHours, PracticalHours, LabHours, ControlType) VALUES
+(1, 1, 3, 72, 36, 18, 18, 'Экзамен'),
+(2, 2, 1, 60, 30, 30, 0, 'Зачет'),
+(3, 3, 5, 48, 24, 12, 12, 'Экзамен');
+
+-- Заполнение таблицы Workload
+INSERT INTO Workload (TeacherID, CurriculumID, Year) VALUES
+(1, 1, 2023),
+(2, 2, 2023),
+(3, 3, 2023);

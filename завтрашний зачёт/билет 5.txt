@@ -1,0 +1,142 @@
+илет №5
+1.	Разработать структуру базы данных расписания аудиторий в СУБД MySQL;
+2.	Разработать структуру базы данных расписания аудиторий в СУБД PostgreSQL;
+3.	Заполнить таблицы тестовым набором данных.
+
+11111111111111111111
+-- Создание базы данных
+CREATE DATABASE IF NOT EXISTS room_scheduling;
+
+-- Использование базы данных
+USE room_scheduling;
+
+-- Таблица: Аудитории (Rooms)
+CREATE TABLE Rooms (
+    RoomID INT PRIMARY KEY AUTO_INCREMENT,
+    RoomNumber VARCHAR(20) NOT NULL,
+    Capacity INT,
+    Description TEXT,
+    Building VARCHAR(255) -- Корпус
+);
+
+-- Таблица: Предметы (Subjects)
+CREATE TABLE Subjects (
+    SubjectID INT PRIMARY KEY AUTO_INCREMENT,
+    SubjectName VARCHAR(255) NOT NULL
+);
+
+-- Таблица: Преподаватели (Teachers)
+CREATE TABLE Teachers (
+    TeacherID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL
+);
+
+-- Таблица: Группы (Groups)
+CREATE TABLE Groups (
+    GroupID INT PRIMARY KEY AUTO_INCREMENT,
+    GroupName VARCHAR(50) NOT NULL
+);
+
+-- Таблица: Расписание (Schedule)
+CREATE TABLE Schedule (
+    ScheduleID INT PRIMARY KEY AUTO_INCREMENT,
+    RoomID INT NOT NULL,
+    SubjectID INT NOT NULL,
+    TeacherID INT NOT NULL,
+    GroupID INT NOT NULL,
+    DayOfWeek ENUM('Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье') NOT NULL,
+    StartTime TIME NOT NULL,
+    EndTime TIME NOT NULL,
+    FOREIGN KEY (RoomID) REFERENCES Rooms(RoomID),
+    FOREIGN KEY (SubjectID) REFERENCES Subjects(SubjectID),
+    FOREIGN KEY (TeacherID) REFERENCES Teachers(TeacherID),
+    FOREIGN KEY (GroupID) REFERENCES Groups(GroupID)
+);
+
+2222222222222222222222222222222 
+-- Создание базы данных
+CREATE DATABASE room_scheduling;
+
+-- Подключение к базе данных
+\c room_scheduling
+
+-- Таблица: Аудитории (Rooms)
+CREATE TABLE Rooms (
+    RoomID SERIAL PRIMARY KEY,
+    RoomNumber VARCHAR(20) NOT NULL,
+    Capacity INT,
+    Description TEXT,
+    Building VARCHAR(255) -- Корпус
+);
+
+-- Таблица: Предметы (Subjects)
+CREATE TABLE Subjects (
+    SubjectID SERIAL PRIMARY KEY,
+    SubjectName VARCHAR(255) NOT NULL
+);
+
+-- Таблица: Преподаватели (Teachers)
+CREATE TABLE Teachers (
+    TeacherID SERIAL PRIMARY KEY,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL
+);
+
+-- Таблица: Группы (Groups)
+CREATE TABLE Groups (
+    GroupID SERIAL PRIMARY KEY,
+    GroupName VARCHAR(50) NOT NULL
+);
+
+-- Тип данных для дня недели (ENUM)
+CREATE TYPE DayOfWeek AS ENUM ('Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье');
+
+-- Таблица: Расписание (Schedule)
+CREATE TABLE Schedule (
+    ScheduleID SERIAL PRIMARY KEY,
+    RoomID INT NOT NULL,
+    SubjectID INT NOT NULL,
+    TeacherID INT NOT NULL,
+    GroupID INT NOT NULL,
+    DayOfWeek DayOfWeek NOT NULL,
+    StartTime TIME NOT NULL,
+    EndTime TIME NOT NULL,
+    FOREIGN KEY (RoomID) REFERENCES Rooms(RoomID),
+    FOREIGN KEY (SubjectID) REFERENCES Subjects(SubjectID),
+    FOREIGN KEY (TeacherID) REFERENCES Teachers(TeacherID),
+    FOREIGN KEY (GroupID) REFERENCES Groups(GroupID)
+);
+
+333333333333333333333333333333333333333333333
+-- Заполнение таблицы Rooms
+INSERT INTO Rooms (RoomNumber, Capacity, Description, Building) VALUES
+('201', 30, 'Обычная аудитория', 'Корпус А'),
+('302', 20, 'Компьютерный класс', 'Корпус Б'),
+('105', 50, 'Лекционная аудитория', 'Корпус А');
+
+-- Заполнение таблицы Subjects
+INSERT INTO Subjects (SubjectName) VALUES
+('Математика'),
+('Информатика'),
+('Физика'),
+('Английский язык');
+
+-- Заполнение таблицы Teachers
+INSERT INTO Teachers (FirstName, LastName) VALUES
+('Иван', 'Иванов'),
+('Петр', 'Петров'),
+('Анна', 'Сидорова');
+
+-- Заполнение таблицы Groups
+INSERT INTO Groups (GroupName) VALUES
+('Группа 1'),
+('Группа 2'),
+('Группа 3');
+
+-- Заполнение таблицы Schedule
+INSERT INTO Schedule (RoomID, SubjectID, TeacherID, GroupID, DayOfWeek, StartTime, EndTime) VALUES
+(1, 1, 1, 1, 'Понедельник', '09:00:00', '10:30:00'),
+(2, 2, 2, 2, 'Вторник', '11:00:00', '12:30:00'),
+(3, 3, 3, 3, 'Среда', '14:00:00', '15:30:00'),
+(1, 4, 1, 2, 'Четверг', '10:30:00', '12:00:00');

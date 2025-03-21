@@ -1,0 +1,239 @@
+Билет №18
+1.	Разработать структуру базы данных пользователей социальной сети в СУБД MySQL;
+2.	Разработать структуру базы данных пользователей социальной сети в СУБД PostgreSQL;
+3.	Заполнить таблицы тестовым набором данных.
+
+11111111111111111111111111111111111111
+-- Создание базы данных
+CREATE DATABASE IF NOT EXISTS social_network;
+
+-- Использование базы данных
+USE social_network;
+
+-- Таблица: Пользователи (Users)
+CREATE TABLE Users (
+    UserID INT PRIMARY KEY AUTO_INCREMENT,
+    Username VARCHAR(255) NOT NULL UNIQUE,
+    Password VARCHAR(255) NOT NULL, -- Хранить хэш пароля!
+    Email VARCHAR(255) UNIQUE,
+    FirstName VARCHAR(255),
+    LastName VARCHAR(255),
+    RegistrationDate DATETIME NOT NULL,
+    DateOfBirth DATE,
+    Gender ENUM('Male', 'Female', 'Other'),
+    ProfilePicture VARCHAR(255), -- Путь к изображению профиля
+    Bio TEXT -- Биография пользователя
+);
+
+-- Таблица: Друзья (Friends)
+CREATE TABLE Friends (
+    UserID1 INT NOT NULL,
+    UserID2 INT NOT NULL,
+    Status ENUM('Pending', 'Accepted', 'Blocked') NOT NULL DEFAULT 'Pending', -- Статус дружбы
+    RequestDate DATETIME NOT NULL,
+    PRIMARY KEY (UserID1, UserID2),
+    FOREIGN KEY (UserID1) REFERENCES Users(UserID),
+    FOREIGN KEY (UserID2) REFERENCES Users(UserID)
+);
+
+-- Таблица: Посты (Posts)
+CREATE TABLE Posts (
+    PostID INT PRIMARY KEY AUTO_INCREMENT,
+    UserID INT NOT NULL,
+    PostText TEXT,
+    PostDate DATETIME NOT NULL,
+    PhotoURL VARCHAR(255), -- URL изображения (если есть)
+    VideoURL VARCHAR(255), -- URL видео (если есть)
+    FOREIGN KEY (UserID) REFERENCES Users(UserID)
+);
+
+-- Таблица: Лайки (Likes)
+CREATE TABLE Likes (
+    LikeID INT PRIMARY KEY AUTO_INCREMENT,
+    PostID INT NOT NULL,
+    UserID INT NOT NULL,
+    LikeDate DATETIME NOT NULL,
+    FOREIGN KEY (PostID) REFERENCES Posts(PostID),
+    FOREIGN KEY (UserID) REFERENCES Users(UserID)
+);
+
+-- Таблица: Комментарии (Comments)
+CREATE TABLE Comments (
+    CommentID INT PRIMARY KEY AUTO_INCREMENT,
+    PostID INT NOT NULL,
+    UserID INT NOT NULL,
+    CommentText TEXT NOT NULL,
+    CommentDate DATETIME NOT NULL,
+    FOREIGN KEY (PostID) REFERENCES Posts(PostID),
+    FOREIGN KEY (UserID) REFERENCES Users(UserID)
+);
+
+-- Таблица: Сообщения (Messages)
+CREATE TABLE Messages (
+    MessageID INT PRIMARY KEY AUTO_INCREMENT,
+    SenderID INT NOT NULL,
+    RecipientID INT NOT NULL,
+    MessageText TEXT NOT NULL,
+    SentDate DATETIME NOT NULL,
+    IsRead BOOLEAN NOT NULL DEFAULT FALSE, -- Прочитано ли сообщение
+    FOREIGN KEY (SenderID) REFERENCES Users(UserID),
+    FOREIGN KEY (RecipientID) REFERENCES Users(UserID)
+);
+
+-- Таблица: Группы (Groups)
+CREATE TABLE Groups (
+    GroupID INT PRIMARY KEY AUTO_INCREMENT,
+    GroupName VARCHAR(255) NOT NULL,
+    Description TEXT,
+    CreatorID INT NOT NULL,
+    CreationDate DATETIME NOT NULL,
+    GroupPicture VARCHAR(255),
+    FOREIGN KEY (CreatorID) REFERENCES Users(UserID)
+);
+
+-- Таблица: Участники групп (GroupMembers)
+CREATE TABLE GroupMembers (
+    GroupID INT NOT NULL,
+    UserID INT NOT NULL,
+    JoinDate DATETIME NOT NULL,
+    Role ENUM('Member', 'Admin') NOT NULL DEFAULT 'Member', -- Роль в группе
+    PRIMARY KEY (GroupID, UserID),
+    FOREIGN KEY (GroupID) REFERENCES Groups(GroupID),
+    FOREIGN KEY (UserID) REFERENCES Users(UserID)
+);
+
+22222222222222222222222222222222222222222222
+-- Создание базы данных
+CREATE DATABASE social_network;
+
+-- Подключение к базе данных
+\c social_network
+
+-- Таблица: Пользователи (Users)
+CREATE TABLE Users (
+    UserID SERIAL PRIMARY KEY,
+    Username VARCHAR(255) NOT NULL UNIQUE,
+    Password VARCHAR(255) NOT NULL, -- Хранить хэш пароля!
+    Email VARCHAR(255) UNIQUE,
+    FirstName VARCHAR(255),
+    LastName VARCHAR(255),
+    RegistrationDate TIMESTAMP NOT NULL,
+    DateOfBirth DATE,
+    Gender VARCHAR(20) CHECK (Gender IN ('Male', 'Female', 'Other')),
+    ProfilePicture VARCHAR(255), -- Путь к изображению профиля
+    Bio TEXT -- Биография пользователя
+);
+
+-- Таблица: Друзья (Friends)
+CREATE TABLE Friends (
+    UserID1 INT NOT NULL,
+    UserID2 INT NOT NULL,
+    Status VARCHAR(20) CHECK (Status IN ('Pending', 'Accepted', 'Blocked')) NOT NULL DEFAULT 'Pending', -- Статус дружбы
+    RequestDate TIMESTAMP NOT NULL,
+    PRIMARY KEY (UserID1, UserID2),
+    FOREIGN KEY (UserID1) REFERENCES Users(UserID),
+    FOREIGN KEY (UserID2) REFERENCES Users(UserID)
+);
+
+-- Таблица: Посты (Posts)
+CREATE TABLE Posts (
+    PostID SERIAL PRIMARY KEY,
+    UserID INT NOT NULL,
+    PostText TEXT,
+    PostDate TIMESTAMP NOT NULL,
+    PhotoURL VARCHAR(255), -- URL изображения (если есть)
+    VideoURL VARCHAR(255), -- URL видео (если есть)
+    FOREIGN KEY (UserID) REFERENCES Users(UserID)
+);
+
+-- Таблица: Лайки (Likes)
+CREATE TABLE Likes (
+    LikeID SERIAL PRIMARY KEY,
+    PostID INT NOT NULL,
+    UserID INT NOT NULL,
+    LikeDate TIMESTAMP NOT NULL,
+    FOREIGN KEY (PostID) REFERENCES Posts(PostID),
+    FOREIGN KEY (UserID) REFERENCES Users(UserID)
+);
+
+-- Таблица: Комментарии (Comments)
+CREATE TABLE Comments (
+    CommentID SERIAL PRIMARY KEY,
+    PostID INT NOT NULL,
+    UserID INT NOT NULL,
+    CommentText TEXT NOT NULL,
+    CommentDate TIMESTAMP NOT NULL,
+    FOREIGN KEY (PostID) REFERENCES Posts(PostID),
+    FOREIGN KEY (UserID) REFERENCES Users(UserID)
+);
+
+-- Таблица: Сообщения (Messages)
+CREATE TABLE Messages (
+    MessageID SERIAL PRIMARY KEY,
+    SenderID INT NOT NULL,
+    RecipientID INT NOT NULL,
+    MessageText TEXT NOT NULL,
+    SentDate TIMESTAMP NOT NULL,
+    IsRead BOOLEAN NOT NULL DEFAULT FALSE, -- Прочитано ли сообщение
+    FOREIGN KEY (SenderID) REFERENCES Users(UserID),
+    FOREIGN KEY (RecipientID) REFERENCES Users(UserID)
+);
+
+-- Таблица: Группы (Groups)
+CREATE TABLE Groups (
+    GroupID SERIAL PRIMARY KEY,
+    GroupName VARCHAR(255) NOT NULL,
+    Description TEXT,
+    CreatorID INT NOT NULL,
+    CreationDate TIMESTAMP NOT NULL,
+    GroupPicture VARCHAR(255),
+    FOREIGN KEY (CreatorID) REFERENCES Users(UserID)
+);
+
+-- Таблица: Участники групп (GroupMembers)
+CREATE TABLE GroupMembers (
+    GroupID INT NOT NULL,
+    UserID INT NOT NULL,
+    JoinDate TIMESTAMP NOT NULL,
+    Role VARCHAR(20) CHECK (Role IN ('Member', 'Admin')) NOT NULL DEFAULT 'Member', -- Роль в группе
+    PRIMARY KEY (GroupID, UserID),
+    FOREIGN KEY (GroupID) REFERENCES Groups(GroupID),
+    FOREIGN KEY (UserID) REFERENCES Users(UserID)
+);
+
+333333333333333333333333333333333333333
+-- Заполнение таблицы Users
+INSERT INTO Users (Username, Password, Email, FirstName, LastName, RegistrationDate, DateOfBirth, Gender, ProfilePicture, Bio) VALUES
+('user1', 'hashed_password_1', 'user1@example.com', 'Иван', 'Иванов', '2023-12-28 10:00:00', '1990-05-15', 'Male', 'profile1.jpg', 'Люблю программирование'),
+('user2', 'hashed_password_2', 'user2@example.com', 'Мария', 'Сидорова', '2023-12-27 15:00:00', '1985-10-20', 'Female', 'profile2.jpg', 'Люблю путешествовать');
+
+-- Заполнение таблицы Friends
+INSERT INTO Friends (UserID1, UserID2, Status, RequestDate) VALUES
+(1, 2, 'Accepted', '2023-12-27 16:00:00');
+
+-- Заполнение таблицы Posts
+INSERT INTO Posts (UserID, PostText, PostDate, PhotoURL) VALUES
+(1, 'Первый пост!', '2023-12-28 11:00:00', 'post1.jpg'),
+(2, 'Отдыхаю на море', '2023-12-27 17:00:00', 'post2.jpg');
+
+-- Заполнение таблицы Likes
+INSERT INTO Likes (PostID, UserID, LikeDate) VALUES
+(1, 2, '2023-12-28 11:15:00'),
+(2, 1, '2023-12-27 17:15:00');
+
+-- Заполнение таблицы Comments
+INSERT INTO Comments (PostID, UserID, CommentText, CommentDate) VALUES
+(1, 2, 'Класс!', '2023-12-28 11:20:00'),
+(2, 1, 'Супер!', '2023-12-27 17:20:00');
+
+-- Заполнение таблицы Messages
+INSERT INTO Messages (SenderID, RecipientID, MessageText, SentDate, IsRead) VALUES
+(1, 2, 'Привет!', '2023-12-28 12:00:00', FALSE);
+
+-- Заполнение таблицы Groups
+INSERT INTO Groups (GroupName, Description, CreatorID, CreationDate, GroupPicture) VALUES
+('Клуб любителей кошек', 'Обсуждаем кошек', 1, '2023-12-28 13:00:00', 'group1.jpg');
+
+-- Заполнение таблицы GroupMembers
+INSERT INTO GroupMembers (GroupID, UserID, JoinDate, Role) VALUES
+(1, 2, '2023-12-28 13:15:00', 'Member');

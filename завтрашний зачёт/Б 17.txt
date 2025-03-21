@@ -1,0 +1,230 @@
+Билет №17
+1.	Разработать структуру базы данных системы электронного документооборота в СУБД MySQL;
+2.	Разработать структуру базы данных системы электронного документооборота в СУБД PostgreSQL;
+3.	Заполнить таблицы тестовым набором данных.
+
+111111111111111111111111111111111111111
+-- Создание базы данных
+CREATE DATABASE IF NOT EXISTS document_management;
+
+-- Использование базы данных
+USE document_management;
+
+-- Таблица: Пользователи (Users)
+CREATE TABLE Users (
+    UserID INT PRIMARY KEY AUTO_INCREMENT,
+    Username VARCHAR(255) NOT NULL UNIQUE,
+    Password VARCHAR(255) NOT NULL,  -- Хранить хэш пароля!
+    FirstName VARCHAR(255),
+    LastName VARCHAR(255),
+    Email VARCHAR(255) UNIQUE,
+    Department VARCHAR(255), -- Отдел
+    Position VARCHAR(255)  -- Должность
+);
+
+-- Таблица: Типы документов (DocumentTypes)
+CREATE TABLE DocumentTypes (
+    DocumentTypeID INT PRIMARY KEY AUTO_INCREMENT,
+    TypeName VARCHAR(255) NOT NULL,  -- Например, "Договор", "Приказ", "Письмо"
+    Description TEXT
+);
+
+-- Таблица: Документы (Documents)
+CREATE TABLE Documents (
+    DocumentID INT PRIMARY KEY AUTO_INCREMENT,
+    DocumentTypeID INT NOT NULL,
+    Title VARCHAR(255) NOT NULL,
+    Description TEXT,
+    CreationDate DATETIME NOT NULL,
+    AuthorID INT NOT NULL, -- Автор документа
+    Filename VARCHAR(255) NOT NULL, -- Имя файла (или путь к файлу)
+    FileSize INT, -- Размер файла в байтах
+    UploadDate DATETIME NOT NULL,
+    FOREIGN KEY (DocumentTypeID) REFERENCES DocumentTypes(DocumentTypeID),
+    FOREIGN KEY (AuthorID) REFERENCES Users(UserID)
+);
+
+-- Таблица: Статусы документов (DocumentStatuses)
+CREATE TABLE DocumentStatuses (
+    DocumentStatusID INT PRIMARY KEY AUTO_INCREMENT,
+    StatusName VARCHAR(255) NOT NULL -- Например, "Черновик", "На утверждении", "Утвержден", "Отклонен"
+);
+
+-- Таблица: История статусов документов (DocumentStatusHistory)
+CREATE TABLE DocumentStatusHistory (
+    DocumentStatusHistoryID INT PRIMARY KEY AUTO_INCREMENT,
+    DocumentID INT NOT NULL,
+    DocumentStatusID INT NOT NULL,
+    ChangeDate DATETIME NOT NULL,
+    ChangedBy INT NOT NULL,  -- Кто изменил статус
+    Comment TEXT, -- Комментарий к изменению статуса
+    FOREIGN KEY (DocumentID) REFERENCES Documents(DocumentID),
+    FOREIGN KEY (DocumentStatusID) REFERENCES DocumentStatuses(DocumentStatusID),
+    FOREIGN KEY (ChangedBy) REFERENCES Users(UserID)
+);
+
+-- Таблица: Рабочие процессы (Workflows) - например, маршруты согласования
+CREATE TABLE Workflows (
+    WorkflowID INT PRIMARY KEY AUTO_INCREMENT,
+    WorkflowName VARCHAR(255) NOT NULL,
+    Description TEXT
+);
+
+-- Таблица: Этапы рабочего процесса (WorkflowSteps)
+CREATE TABLE WorkflowSteps (
+    WorkflowStepID INT PRIMARY KEY AUTO_INCREMENT,
+    WorkflowID INT NOT NULL,
+    StepNumber INT NOT NULL, -- Порядковый номер шага
+    UserID INT NOT NULL,  -- Пользователь, который должен выполнить этот шаг
+    Action VARCHAR(255), -- Действие на шаге (например, "Согласовать", "Отклонить", "Ознакомиться")
+    FOREIGN KEY (WorkflowID) REFERENCES Workflows(WorkflowID),
+    FOREIGN KEY (UserID) REFERENCES Users(UserID)
+);
+
+-- Таблица: Документы в рабочих процессах (DocumentWorkflows)
+CREATE TABLE DocumentWorkflows (
+    DocumentWorkflowID INT PRIMARY KEY AUTO_INCREMENT,
+    DocumentID INT NOT NULL,
+    WorkflowID INT NOT NULL,
+    CurrentStep INT NOT NULL DEFAULT 1, -- Текущий шаг рабочего процесса
+    StartDate DATETIME NOT NULL,
+    EndDate DATETIME,  -- Дата завершения рабочего процесса
+    FOREIGN KEY (DocumentID) REFERENCES Documents(DocumentID),
+    FOREIGN KEY (WorkflowID) REFERENCES Workflows(WorkflowID)
+);
+
+22222222222222222222222222
+-- Создание базы данных
+CREATE DATABASE document_management;
+
+-- Подключение к базе данных
+\c document_management
+
+-- Таблица: Пользователи (Users)
+CREATE TABLE Users (
+    UserID SERIAL PRIMARY KEY,
+    Username VARCHAR(255) NOT NULL UNIQUE,
+    Password VARCHAR(255) NOT NULL,  -- Хранить хэш пароля!
+    FirstName VARCHAR(255),
+    LastName VARCHAR(255),
+    Email VARCHAR(255) UNIQUE,
+    Department VARCHAR(255), -- Отдел
+    Position VARCHAR(255)  -- Должность
+);
+
+-- Таблица: Типы документов (DocumentTypes)
+CREATE TABLE DocumentTypes (
+    DocumentTypeID SERIAL PRIMARY KEY,
+    TypeName VARCHAR(255) NOT NULL,  -- Например, "Договор", "Приказ", "Письмо"
+    Description TEXT
+);
+
+-- Таблица: Документы (Documents)
+CREATE TABLE Documents (
+    DocumentID SERIAL PRIMARY KEY,
+    DocumentTypeID INT NOT NULL,
+    Title VARCHAR(255) NOT NULL,
+    Description TEXT,
+    CreationDate TIMESTAMP NOT NULL,
+    AuthorID INT NOT NULL, -- Автор документа
+    Filename VARCHAR(255) NOT NULL, -- Имя файла (или путь к файлу)
+    FileSize INT, -- Размер файла в байтах
+    UploadDate TIMESTAMP NOT NULL,
+    FOREIGN KEY (DocumentTypeID) REFERENCES DocumentTypes(DocumentTypeID),
+    FOREIGN KEY (AuthorID) REFERENCES Users(UserID)
+);
+
+-- Таблица: Статусы документов (DocumentStatuses)
+CREATE TABLE DocumentStatuses (
+    DocumentStatusID SERIAL PRIMARY KEY,
+    StatusName VARCHAR(255) NOT NULL -- Например, "Черновик", "На утверждении", "Утвержден", "Отклонен"
+);
+
+-- Таблица: История статусов документов (DocumentStatusHistory)
+CREATE TABLE DocumentStatusHistory (
+    DocumentStatusHistoryID SERIAL PRIMARY KEY,
+    DocumentID INT NOT NULL,
+    DocumentStatusID INT NOT NULL,
+    ChangeDate TIMESTAMP NOT NULL,
+    ChangedBy INT NOT NULL,  -- Кто изменил статус
+    Comment TEXT, -- Комментарий к изменению статуса
+    FOREIGN KEY (DocumentID) REFERENCES Documents(DocumentID),
+    FOREIGN KEY (DocumentStatusID) REFERENCES DocumentStatuses(DocumentStatusID),
+    FOREIGN KEY (ChangedBy) REFERENCES Users(UserID)
+);
+
+-- Таблица: Рабочие процессы (Workflows) - например, маршруты согласования
+CREATE TABLE Workflows (
+    WorkflowID SERIAL PRIMARY KEY,
+    WorkflowName VARCHAR(255) NOT NULL,
+    Description TEXT
+);
+
+-- Таблица: Этапы рабочего процесса (WorkflowSteps)
+CREATE TABLE WorkflowSteps (
+    WorkflowStepID SERIAL PRIMARY KEY,
+    WorkflowID INT NOT NULL,
+    StepNumber INT NOT NULL, -- Порядковый номер шага
+    UserID INT NOT NULL,  -- Пользователь, который должен выполнить этот шаг
+    Action VARCHAR(255), -- Действие на шаге (например, "Согласовать", "Отклонить", "Ознакомиться")
+    FOREIGN KEY (WorkflowID) REFERENCES Workflows(WorkflowID),
+    FOREIGN KEY (UserID) REFERENCES Users(UserID)
+);
+
+-- Таблица: Документы в рабочих процессах (DocumentWorkflows)
+CREATE TABLE DocumentWorkflows (
+    DocumentWorkflowID SERIAL PRIMARY KEY,
+    DocumentID INT NOT NULL,
+    WorkflowID INT NOT NULL,
+    CurrentStep INT NOT NULL DEFAULT 1, -- Текущий шаг рабочего процесса
+    StartDate TIMESTAMP NOT NULL,
+    EndDate TIMESTAMP,  -- Дата завершения рабочего процесса
+    FOREIGN KEY (DocumentID) REFERENCES Documents(DocumentID),
+    FOREIGN KEY (WorkflowID) REFERENCES Workflows(WorkflowID)
+);
+
+3333333333333333333333
+-- Заполнение таблицы Users
+INSERT INTO Users (Username, Password, Email, FirstName, LastName, Department, Position) VALUES
+('user1', 'hashed_password_1', 'user1@example.com', 'Иван', 'Иванов', 'IT', 'Разработчик'),
+('user2', 'hashed_password_2', 'user2@example.com', 'Мария', 'Сидорова', 'Бухгалтерия', 'Бухгалтер');
+
+-- Заполнение таблицы DocumentTypes
+INSERT INTO DocumentTypes (TypeName, Description) VALUES
+('Договор', 'Договор с контрагентом'),
+('Приказ', 'Приказ по организации'),
+('Письмо', 'Входящее/исходящее письмо');
+
+-- Заполнение таблицы Documents
+INSERT INTO Documents (DocumentTypeID, Title, Description, CreationDate, AuthorID, Filename, FileSize, UploadDate) VALUES
+(1, 'Договор №123', 'Договор поставки', '2023-12-28 10:00:00', 1, 'dogovor_123.pdf', 123456, '2023-12-28 10:15:00'),
+(2, 'Приказ №456', 'Приказ о приеме на работу', '2023-12-27 15:00:00', 2, 'prikaz_456.docx', 654321, '2023-12-27 15:30:00');
+
+-- Заполнение таблицы DocumentStatuses
+INSERT INTO DocumentStatuses (StatusName) VALUES
+('Черновик'),
+('На утверждении'),
+('Утвержден'),
+('Отклонен');
+
+-- Заполнение таблицы DocumentStatusHistory
+INSERT INTO DocumentStatusHistory (DocumentID, DocumentStatusID, ChangeDate, ChangedBy, Comment) VALUES
+(1, 1, '2023-12-28 10:15:00', 1, 'Создан черновик'),
+(2, 2, '2023-12-27 15:30:00', 2, 'Направлен на утверждение');
+
+-- Заполнение таблицы Workflows
+INSERT INTO Workflows (WorkflowName, Description) VALUES
+('Согласование договора', 'Процесс согласования договора с контрагентом'),
+('Утверждение приказа', 'Процесс утверждения приказа по организации');
+
+-- Заполнение таблицы WorkflowSteps
+INSERT INTO WorkflowSteps (WorkflowID, StepNumber, UserID, Action) VALUES
+(1, 1, 1, 'Согласовать'),
+(1, 2, 2, 'Подписать'),
+(2, 1, 2, 'Согласовать'),
+(2, 2, 1, 'Утвердить');
+
+-- Заполнение таблицы DocumentWorkflows
+INSERT INTO DocumentWorkflows (DocumentID, WorkflowID, CurrentStep, StartDate) VALUES
+(1, 1, 1, '2023-12-28 10:15:00'),
+(2, 2, 1, '2023-12-27 15:30:00');

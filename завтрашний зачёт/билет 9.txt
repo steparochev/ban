@@ -1,0 +1,184 @@
+Билет №9
+1.	Разработать структуру базы данных автозаправочной станции в СУБД MySQL;
+2.	Разработать структуру базы данных автозаправочной станции в СУБД PostgreSQL;
+3.	Заполнить таблицы тестовым набором данных.
+
+11111111111111111111111111111111111
+-- Создание базы данных
+CREATE DATABASE IF NOT EXISTS gas_station;
+
+-- Использование базы данных
+USE gas_station;
+
+-- Таблица: Типы топлива (FuelTypes)
+CREATE TABLE FuelTypes (
+    FuelTypeID INT PRIMARY KEY AUTO_INCREMENT,
+    FuelName VARCHAR(255) NOT NULL,
+    OctaneRating INT  -- Октановое число (например, 92, 95, 98)
+);
+
+-- Таблица: Цены на топливо (FuelPrices)
+CREATE TABLE FuelPrices (
+    FuelPriceID INT PRIMARY KEY AUTO_INCREMENT,
+    FuelTypeID INT NOT NULL,
+    PricePerLiter DECIMAL(5, 2) NOT NULL,
+    EffectiveDate DATETIME NOT NULL,  -- Дата и время начала действия цены
+    FOREIGN KEY (FuelTypeID) REFERENCES FuelTypes(FuelTypeID)
+);
+
+-- Таблица: Сотрудники (Employees)
+CREATE TABLE Employees (
+    EmployeeID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    Position VARCHAR(255)  -- Должность (например, "Кассир", "Оператор")
+);
+
+-- Таблица: Транзакции (Transactions)
+CREATE TABLE Transactions (
+    TransactionID INT PRIMARY KEY AUTO_INCREMENT,
+    EmployeeID INT NOT NULL,
+    TransactionDate DATETIME NOT NULL,
+    TotalAmount DECIMAL(10, 2) NOT NULL,
+    PaymentMethod VARCHAR(255), -- Способ оплаты (например, "Наличные", "Карта")
+    FOREIGN KEY (EmployeeID) REFERENCES Employees(EmployeeID)
+);
+
+-- Таблица: Детали транзакций (TransactionDetails)
+CREATE TABLE TransactionDetails (
+    TransactionDetailID INT PRIMARY KEY AUTO_INCREMENT,
+    TransactionID INT NOT NULL,
+    FuelTypeID INT NOT NULL,
+    Quantity DECIMAL(10, 2) NOT NULL,  -- Количество литров
+    PricePerLiter DECIMAL(5, 2) NOT NULL, -- Цена за литр на момент транзакции
+    FOREIGN KEY (TransactionID) REFERENCES Transactions(TransactionID),
+    FOREIGN KEY (FuelTypeID) REFERENCES FuelTypes(FuelTypeID)
+);
+
+-- Таблица: Товары (Products)
+CREATE TABLE Products (
+    ProductID INT PRIMARY KEY AUTO_INCREMENT,
+    ProductName VARCHAR(255) NOT NULL,
+    Description TEXT,
+    Price DECIMAL(10, 2) NOT NULL
+);
+
+-- Таблица: Детали транзакций (Products)
+CREATE TABLE TransactionProducts (
+    TransactionProductID INT PRIMARY KEY AUTO_INCREMENT,
+    TransactionID INT NOT NULL,
+    ProductID INT NOT NULL,
+    Quantity INT NOT NULL,
+    Price DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (TransactionID) REFERENCES Transactions(TransactionID),
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
+
+22222222222222222222222222222222222
+-- Создание базы данных
+CREATE DATABASE gas_station;
+
+-- Подключение к базе данных
+\c gas_station
+
+-- Таблица: Типы топлива (FuelTypes)
+CREATE TABLE FuelTypes (
+    FuelTypeID SERIAL PRIMARY KEY,
+    FuelName VARCHAR(255) NOT NULL,
+    OctaneRating INT  -- Октановое число (например, 92, 95, 98)
+);
+
+-- Таблица: Цены на топливо (FuelPrices)
+CREATE TABLE FuelPrices (
+    FuelPriceID SERIAL PRIMARY KEY,
+    FuelTypeID INT NOT NULL,
+    PricePerLiter DECIMAL(5, 2) NOT NULL,
+    EffectiveDate TIMESTAMP NOT NULL,  -- Дата и время начала действия цены
+    FOREIGN KEY (FuelTypeID) REFERENCES FuelTypes(FuelTypeID)
+);
+
+-- Таблица: Сотрудники (Employees)
+CREATE TABLE Employees (
+    EmployeeID SERIAL PRIMARY KEY,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    Position VARCHAR(255)  -- Должность (например, "Кассир", "Оператор")
+);
+
+-- Таблица: Транзакции (Transactions)
+CREATE TABLE Transactions (
+    TransactionID SERIAL PRIMARY KEY,
+    EmployeeID INT NOT NULL,
+    TransactionDate TIMESTAMP NOT NULL,
+    TotalAmount DECIMAL(10, 2) NOT NULL,
+    PaymentMethod VARCHAR(255), -- Способ оплаты (например, "Наличные", "Карта")
+    FOREIGN KEY (EmployeeID) REFERENCES Employees(EmployeeID)
+);
+
+-- Таблица: Детали транзакций (TransactionDetails)
+CREATE TABLE TransactionDetails (
+    TransactionDetailID SERIAL PRIMARY KEY,
+    TransactionID INT NOT NULL,
+    FuelTypeID INT NOT NULL,
+    Quantity DECIMAL(10, 2) NOT NULL,  -- Количество литров
+    PricePerLiter DECIMAL(5, 2) NOT NULL, -- Цена за литр на момент транзакции
+    FOREIGN KEY (TransactionID) REFERENCES Transactions(TransactionID),
+    FOREIGN KEY (FuelTypeID) REFERENCES FuelTypes(FuelTypeID)
+);
+
+-- Таблица: Товары (Products)
+CREATE TABLE Products (
+    ProductID SERIAL PRIMARY KEY,
+    ProductName VARCHAR(255) NOT NULL,
+    Description TEXT,
+    Price DECIMAL(10, 2) NOT NULL
+);
+
+-- Таблица: Детали транзакций (Products)
+CREATE TABLE TransactionProducts (
+    TransactionProductID SERIAL PRIMARY KEY,
+    TransactionID INT NOT NULL,
+    ProductID INT NOT NULL,
+    Quantity INT NOT NULL,
+    Price DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (TransactionID) REFERENCES Transactions(TransactionID),
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
+
+333333333333333333333333333333333333333333
+-- Заполнение таблицы FuelTypes
+INSERT INTO FuelTypes (FuelName, OctaneRating) VALUES
+('АИ-92', 92),
+('АИ-95', 95),
+('Дизель', NULL);
+
+-- Заполнение таблицы FuelPrices
+INSERT INTO FuelPrices (FuelTypeID, PricePerLiter, EffectiveDate) VALUES
+(1, 50.00, '2023-12-27 00:00:00'),
+(2, 55.00, '2023-12-27 00:00:00'),
+(3, 60.00, '2023-12-27 00:00:00');
+
+-- Заполнение таблицы Employees
+INSERT INTO Employees (FirstName, LastName, Position) VALUES
+('Иван', 'Иванов', 'Кассир'),
+('Петр', 'Петров', 'Оператор');
+
+-- Заполнение таблицы Transactions
+INSERT INTO Transactions (EmployeeID, TransactionDate, TotalAmount, PaymentMethod) VALUES
+(1, '2023-12-27 10:00:00', 1000.00, 'Карта'),
+(2, '2023-12-27 11:00:00', 500.00, 'Наличные');
+
+-- Заполнение таблицы TransactionDetails
+INSERT INTO TransactionDetails (TransactionID, FuelTypeID, Quantity, PricePerLiter) VALUES
+(1, 2, 18.18, 55.00),
+(2, 1, 10.00, 50.00);
+
+-- Заполнение таблицы Products
+INSERT INTO Products (ProductName, Description, Price) VALUES
+('Вода 0.5л', 'Минеральная вода', 50.00),
+('Шоколад', 'Молочный шоколад', 100.00);
+
+-- Заполнение таблицы TransactionProducts
+INSERT INTO TransactionProducts (TransactionID, ProductID, Quantity, Price) VALUES
+(1, 1, 2, 50.00),
+(2, 2, 1, 100.00);

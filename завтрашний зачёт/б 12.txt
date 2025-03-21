@@ -1,0 +1,178 @@
+Билет №12
+1.	Разработать структуру базы данных учёта клиентов отеля в СУБД MySQL;
+2.	Разработать структуру базы данных учёта клиентов отеля в СУБД PostgreSQL;
+3.	Заполнить таблицы тестовым набором данных.
+
+111111111111111111111111111111111111111111111111
+-- Создание базы данных
+CREATE DATABASE IF NOT EXISTS hotel_management;
+
+-- Использование базы данных
+USE hotel_management;
+
+-- Таблица: Клиенты (Customers)
+CREATE TABLE Customers (
+    CustomerID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    PhoneNumber VARCHAR(20),
+    Email VARCHAR(255),
+    Address VARCHAR(255),
+    PassportNumber VARCHAR(20) UNIQUE -- Номер паспорта
+);
+
+-- Таблица: Типы номеров (RoomTypes)
+CREATE TABLE RoomTypes (
+    RoomTypeID INT PRIMARY KEY AUTO_INCREMENT,
+    TypeName VARCHAR(255) NOT NULL, -- Например, "Одноместный", "Двухместный", "Люкс"
+    Description TEXT,
+    PricePerNight DECIMAL(10, 2) NOT NULL
+);
+
+-- Таблица: Номера (Rooms)
+CREATE TABLE Rooms (
+    RoomID INT PRIMARY KEY AUTO_INCREMENT,
+    RoomTypeID INT NOT NULL,
+    RoomNumber VARCHAR(10) NOT NULL, -- Номер комнаты (например, "101", "205A")
+    Floor INT, -- Этаж
+    Description TEXT,
+    FOREIGN KEY (RoomTypeID) REFERENCES RoomTypes(RoomTypeID)
+);
+
+-- Таблица: Бронирования (Bookings)
+CREATE TABLE Bookings (
+    BookingID INT PRIMARY KEY AUTO_INCREMENT,
+    CustomerID INT NOT NULL,
+    RoomID INT NOT NULL,
+    CheckInDate DATE NOT NULL,
+    CheckOutDate DATE NOT NULL,
+    NumberOfGuests INT,
+    TotalPrice DECIMAL(10, 2) NOT NULL,
+    BookingDate DATETIME NOT NULL, -- Дата бронирования
+    Status ENUM('Забронировано', 'Подтверждено', 'Отменено', 'Заселено', 'Выселено'),
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID),
+    FOREIGN KEY (RoomID) REFERENCES Rooms(RoomID)
+);
+
+-- Таблица: Услуги (Services)
+CREATE TABLE Services (
+    ServiceID INT PRIMARY KEY AUTO_INCREMENT,
+    ServiceName VARCHAR(255) NOT NULL,
+    Description TEXT,
+    Price DECIMAL(10, 2) NOT NULL
+);
+
+-- Таблица: Оказанные услуги (BookingServices)
+CREATE TABLE BookingServices (
+    BookingServiceID INT PRIMARY KEY AUTO_INCREMENT,
+    BookingID INT NOT NULL,
+    ServiceID INT NOT NULL,
+    Quantity INT NOT NULL, -- Количество оказанных услуг
+    ServiceDate DATE,
+    FOREIGN KEY (BookingID) REFERENCES Bookings(BookingID),
+    FOREIGN KEY (ServiceID) REFERENCES Services(ServiceID)
+);
+
+2222222222222222222222222222222222
+-- Создание базы данных
+CREATE DATABASE hotel_management;
+
+-- Подключение к базе данных
+\c hotel_management
+
+-- Таблица: Клиенты (Customers)
+CREATE TABLE Customers (
+    CustomerID SERIAL PRIMARY KEY,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    PhoneNumber VARCHAR(20),
+    Email VARCHAR(255),
+    Address VARCHAR(255),
+    PassportNumber VARCHAR(20) UNIQUE -- Номер паспорта
+);
+
+-- Таблица: Типы номеров (RoomTypes)
+CREATE TABLE RoomTypes (
+    RoomTypeID SERIAL PRIMARY KEY,
+    TypeName VARCHAR(255) NOT NULL, -- Например, "Одноместный", "Двухместный", "Люкс"
+    Description TEXT,
+    PricePerNight DECIMAL(10, 2) NOT NULL
+);
+
+-- Таблица: Номера (Rooms)
+CREATE TABLE Rooms (
+    RoomID SERIAL PRIMARY KEY,
+    RoomTypeID INT NOT NULL,
+    RoomNumber VARCHAR(10) NOT NULL, -- Номер комнаты (например, "101", "205A")
+    Floor INT, -- Этаж
+    Description TEXT,
+    FOREIGN KEY (RoomTypeID) REFERENCES RoomTypes(RoomTypeID)
+);
+
+-- Таблица: Бронирования (Bookings)
+CREATE TABLE Bookings (
+    BookingID SERIAL PRIMARY KEY,
+    CustomerID INT NOT NULL,
+    RoomID INT NOT NULL,
+    CheckInDate DATE NOT NULL,
+    CheckOutDate DATE NOT NULL,
+    NumberOfGuests INT,
+    TotalPrice DECIMAL(10, 2) NOT NULL,
+    BookingDate TIMESTAMP NOT NULL, -- Дата бронирования
+    Status VARCHAR(20) CHECK (Status IN ('Забронировано', 'Подтверждено', 'Отменено', 'Заселено', 'Выселено')),
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID),
+    FOREIGN KEY (RoomID) REFERENCES Rooms(RoomID)
+);
+
+-- Таблица: Услуги (Services)
+CREATE TABLE Services (
+    ServiceID SERIAL PRIMARY KEY,
+    ServiceName VARCHAR(255) NOT NULL,
+    Description TEXT,
+    Price DECIMAL(10, 2) NOT NULL
+);
+
+-- Таблица: Оказанные услуги (BookingServices)
+CREATE TABLE BookingServices (
+    BookingServiceID SERIAL PRIMARY KEY,
+    BookingID INT NOT NULL,
+    ServiceID INT NOT NULL,
+    Quantity INT NOT NULL, -- Количество оказанных услуг
+    ServiceDate DATE,
+    FOREIGN KEY (BookingID) REFERENCES Bookings(BookingID),
+    FOREIGN KEY (ServiceID) REFERENCES Services(ServiceID)
+);
+
+333333333333333333333333333333333
+-- Заполнение таблицы Customers
+INSERT INTO Customers (FirstName, LastName, PhoneNumber, Email, Address, PassportNumber) VALUES
+('Иван', 'Иванов', '123-456-7890', 'ivan.ivanov@example.com', 'Москва, ул. Ленина, 1', '1234567890'),
+('Мария', 'Сидорова', '987-654-3210', 'maria.sidorova@example.com', 'Санкт-Петербург, Невский пр., 2', '0987654321');
+
+-- Заполнение таблицы RoomTypes
+INSERT INTO RoomTypes (TypeName, Description, PricePerNight) VALUES
+('Одноместный', 'Номер с одной кроватью', 2000.00),
+('Двухместный', 'Номер с двумя кроватями', 3500.00),
+('Люкс', 'Просторный номер с удобствами', 5000.00);
+
+-- Заполнение таблицы Rooms
+INSERT INTO Rooms (RoomTypeID, RoomNumber, Floor, Description) VALUES
+(1, '101', 1, 'Одноместный номер на первом этаже'),
+(2, '202', 2, 'Двухместный номер с видом на город'),
+(3, '303', 3, 'Люкс номер с балконом');
+
+-- Заполнение таблицы Bookings
+INSERT INTO Bookings (CustomerID, RoomID, CheckInDate, CheckOutDate, NumberOfGuests, TotalPrice, BookingDate, Status) VALUES
+(1, 1, '2023-12-28', '2023-12-30', 1, 4000.00, '2023-12-25 12:00:00', 'Подтверждено'),
+(2, 2, '2023-12-29', '2023-12-31', 2, 7000.00, '2023-12-26 15:00:00', 'Забронировано');
+
+-- Заполнение таблицы Services
+INSERT INTO Services (ServiceName, Description, Price) VALUES
+('Завтрак', 'Континентальный завтрак', 500.00),
+('Уборка номера', 'Ежедневная уборка номера', 300.00),
+('Трансфер', 'Трансфер из аэропорта', 1000.00);
+
+-- Заполнение таблицы BookingServices
+INSERT INTO BookingServices (BookingID, ServiceID, Quantity, ServiceDate) VALUES
+(1, 1, 2, '2023-12-28'),
+(2, 2, 2, '2023-12-29');

@@ -1,0 +1,129 @@
+Билет №4
+1.	Разработать структуру базы данных характеристик компьютерных классов в СУБД MySQL;
+2.	Разработать структуру базы данных характеристик компьютерных классов в СУБД PostgreSQL;
+3.	Заполнить таблицы тестовым набором данных.
+
+
+
+111111111111111111111111111111111111111
+-- Создание базы данных
+CREATE DATABASE IF NOT EXISTS computer_lab_inventory;
+
+-- Использование базы данных
+USE computer_lab_inventory;
+
+-- Таблица: Компьютерные классы (ComputerLabs)
+CREATE TABLE ComputerLabs (
+    LabID INT PRIMARY KEY AUTO_INCREMENT,
+    LabName VARCHAR(255) NOT NULL,
+    RoomNumber VARCHAR(20),
+    Capacity INT, -- Вместимость
+    Description TEXT  -- Описание класса
+);
+
+-- Таблица: Типы оборудования (EquipmentTypes)
+CREATE TABLE EquipmentTypes (
+    EquipmentTypeID INT PRIMARY KEY AUTO_INCREMENT,
+    TypeName VARCHAR(255) NOT NULL,
+    Description TEXT
+);
+
+-- Таблица: Оборудование (Equipment)
+CREATE TABLE Equipment (
+    EquipmentID INT PRIMARY KEY AUTO_INCREMENT,
+    EquipmentTypeID INT NOT NULL,
+    LabID INT NOT NULL,
+    SerialNumber VARCHAR(255) UNIQUE,
+    Model VARCHAR(255),
+    Manufacturer VARCHAR(255),
+    PurchaseDate DATE,
+    Status VARCHAR(50), -- "Работает", "Неисправен", "Списан"
+    FOREIGN KEY (EquipmentTypeID) REFERENCES EquipmentTypes(EquipmentTypeID),
+    FOREIGN KEY (LabID) REFERENCES ComputerLabs(LabID)
+);
+
+-- Таблица: Характеристики оборудования (EquipmentCharacteristics)
+CREATE TABLE EquipmentCharacteristics (
+    CharacteristicID INT PRIMARY KEY AUTO_INCREMENT,
+    EquipmentID INT NOT NULL,
+    CharacteristicName VARCHAR(255) NOT NULL,
+    CharacteristicValue VARCHAR(255),
+    FOREIGN KEY (EquipmentID) REFERENCES Equipment(EquipmentID)
+);
+
+
+222222222222222222222222222222
+-- Создание базы данных
+CREATE DATABASE computer_lab_inventory;
+
+-- Подключение к базе данных
+\c computer_lab_inventory
+
+-- Таблица: Компьютерные классы (ComputerLabs)
+CREATE TABLE ComputerLabs (
+    LabID SERIAL PRIMARY KEY,
+    LabName VARCHAR(255) NOT NULL,
+    RoomNumber VARCHAR(20),
+    Capacity INT, -- Вместимость
+    Description TEXT  -- Описание класса
+);
+
+-- Таблица: Типы оборудования (EquipmentTypes)
+CREATE TABLE EquipmentTypes (
+    EquipmentTypeID SERIAL PRIMARY KEY,
+    TypeName VARCHAR(255) NOT NULL,
+    Description TEXT
+);
+
+-- Таблица: Оборудование (Equipment)
+CREATE TABLE Equipment (
+    EquipmentID SERIAL PRIMARY KEY,
+    EquipmentTypeID INT NOT NULL,
+    LabID INT NOT NULL,
+    SerialNumber VARCHAR(255) UNIQUE,
+    Model VARCHAR(255),
+    Manufacturer VARCHAR(255),
+    PurchaseDate DATE,
+    Status VARCHAR(50), -- "Работает", "Неисправен", "Списан"
+    FOREIGN KEY (EquipmentTypeID) REFERENCES EquipmentTypes(EquipmentTypeID),
+    FOREIGN KEY (LabID) REFERENCES ComputerLabs(LabID)
+);
+
+-- Таблица: Характеристики оборудования (EquipmentCharacteristics)
+CREATE TABLE EquipmentCharacteristics (
+    CharacteristicID SERIAL PRIMARY KEY,
+    EquipmentID INT NOT NULL,
+    CharacteristicName VARCHAR(255) NOT NULL,
+    CharacteristicValue VARCHAR(255),
+    FOREIGN KEY (EquipmentID) REFERENCES Equipment(EquipmentID)
+);
+
+
+3333333333333333333333333333333333333333333333
+-- Заполнение таблицы ComputerLabs
+INSERT INTO ComputerLabs (LabName, RoomNumber, Capacity, Description) VALUES
+('Компьютерный класс 1', '101', 25, 'Класс для общих занятий'),
+('Компьютерный класс 2', '102', 20, 'Класс с графическими станциями');
+
+-- Заполнение таблицы EquipmentTypes
+INSERT INTO EquipmentTypes (TypeName, Description) VALUES
+('Компьютер', 'Настольный компьютер'),
+('Монитор', 'ЖК-монитор'),
+('Проектор', 'Мультимедийный проектор');
+
+-- Заполнение таблицы Equipment
+INSERT INTO Equipment (EquipmentTypeID, LabID, SerialNumber, Model, Manufacturer, PurchaseDate, Status) VALUES
+(1, 1, 'SN-12345', 'Dell OptiPlex 7080', 'Dell', '2020-05-10', 'Работает'),
+(2, 1, 'SN-67890', 'Dell P2419H', 'Dell', '2020-05-10', 'Работает'),
+(1, 2, 'SN-11223', 'Apple iMac 27"', 'Apple', '2021-08-15', 'Работает'),
+(3, 2, 'SN-44556', 'Epson EB-X41', 'Epson', '2021-08-15', 'Работает');
+
+-- Заполнение таблицы EquipmentCharacteristics
+INSERT INTO EquipmentCharacteristics (EquipmentID, CharacteristicName, CharacteristicValue) VALUES
+(1, 'Процессор', 'Intel Core i5'),
+(1, 'RAM', '16GB'),
+(1, 'HDD', '1TB'),
+(2, 'Размер экрана', '24 дюйма'),
+(3, 'Процессор', 'Intel Core i7'),
+(3, 'RAM', '32GB'),
+(4, 'Яркость', '3600 ANSI люмен');

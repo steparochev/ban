@@ -1,0 +1,126 @@
+Билет №16
+1.	Разработать структуру базы данных учёта движения средств клиентов банка в СУБД MySQL;
+2.	Разработать структуру базы данных учёта движения средств клиентов банка в СУБД PostgreSQL;
+3.	Заполнить таблицы тестовым набором данных.
+
+11111111111111111111111111111111
+-- Создание базы данных
+CREATE DATABASE IF NOT EXISTS bank_transactions;
+
+-- Использование базы данных
+USE bank_transactions;
+
+-- Таблица: Клиенты (Clients)
+CREATE TABLE Clients (
+    ClientID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    DateOfBirth DATE,
+    Address VARCHAR(255),
+    PhoneNumber VARCHAR(20),
+    Email VARCHAR(255)
+);
+
+-- Таблица: Счета (Accounts)
+CREATE TABLE Accounts (
+    AccountID INT PRIMARY KEY AUTO_INCREMENT,
+    ClientID INT NOT NULL,
+    AccountNumber VARCHAR(20) UNIQUE NOT NULL, -- Номер счета
+    AccountType ENUM('Дебетовый', 'Кредитный', 'Сберегательный') NOT NULL,
+    Currency VARCHAR(3) NOT NULL DEFAULT 'RUB', -- Валюта счета (например, RUB, USD, EUR)
+    Balance DECIMAL(15, 2) NOT NULL DEFAULT 0.00, -- Баланс счета
+    OpenDate DATETIME NOT NULL,
+    CloseDate DATETIME,  -- Дата закрытия счета (если закрыт)
+    FOREIGN KEY (ClientID) REFERENCES Clients(ClientID)
+);
+
+-- Таблица: Типы транзакций (TransactionTypes)
+CREATE TABLE TransactionTypes (
+    TransactionTypeID INT PRIMARY KEY AUTO_INCREMENT,
+    TypeName VARCHAR(255) NOT NULL,  -- Например, "Пополнение", "Снятие", "Перевод"
+    Description TEXT
+);
+
+-- Таблица: Транзакции (Transactions)
+CREATE TABLE Transactions (
+    TransactionID INT PRIMARY KEY AUTO_INCREMENT,
+    AccountID INT NOT NULL,
+    TransactionTypeID INT NOT NULL,
+    TransactionDate DATETIME NOT NULL,
+    Amount DECIMAL(15, 2) NOT NULL,
+    Description TEXT,
+    FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID),
+    FOREIGN KEY (TransactionTypeID) REFERENCES TransactionTypes(TransactionTypeID)
+);
+
+2222222222222222222222222222222222222222222222222222
+-- Создание базы данных
+CREATE DATABASE bank_transactions;
+
+-- Подключение к базе данных
+\c bank_transactions
+
+-- Таблица: Клиенты (Clients)
+CREATE TABLE Clients (
+    ClientID SERIAL PRIMARY KEY,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    DateOfBirth DATE,
+    Address VARCHAR(255),
+    PhoneNumber VARCHAR(20),
+    Email VARCHAR(255)
+);
+
+-- Таблица: Счета (Accounts)
+CREATE TABLE Accounts (
+    AccountID SERIAL PRIMARY KEY,
+    ClientID INT NOT NULL,
+    AccountNumber VARCHAR(20) UNIQUE NOT NULL, -- Номер счета
+    AccountType VARCHAR(20) CHECK (AccountType IN ('Дебетовый', 'Кредитный', 'Сберегательный')) NOT NULL,
+    Currency VARCHAR(3) NOT NULL DEFAULT 'RUB', -- Валюта счета (например, RUB, USD, EUR)
+    Balance DECIMAL(15, 2) NOT NULL DEFAULT 0.00, -- Баланс счета
+    OpenDate TIMESTAMP NOT NULL,
+    CloseDate TIMESTAMP,  -- Дата закрытия счета (если закрыт)
+    FOREIGN KEY (ClientID) REFERENCES Clients(ClientID)
+);
+
+-- Таблица: Типы транзакций (TransactionTypes)
+CREATE TABLE TransactionTypes (
+    TransactionTypeID SERIAL PRIMARY KEY,
+    TypeName VARCHAR(255) NOT NULL,  -- Например, "Пополнение", "Снятие", "Перевод"
+    Description TEXT
+);
+
+-- Таблица: Транзакции (Transactions)
+CREATE TABLE Transactions (
+    TransactionID SERIAL PRIMARY KEY,
+    AccountID INT NOT NULL,
+    TransactionTypeID INT NOT NULL,
+    TransactionDate TIMESTAMP NOT NULL,
+    Amount DECIMAL(15, 2) NOT NULL,
+    Description TEXT,
+    FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID),
+    FOREIGN KEY (TransactionTypeID) REFERENCES TransactionTypes(TransactionTypeID)
+);
+
+3333333333333333333333333333333333333333333333333333333
+-- Заполнение таблицы Clients
+INSERT INTO Clients (FirstName, LastName, DateOfBirth, Address, PhoneNumber, Email) VALUES
+('Иван', 'Иванов', '1990-05-15', 'Москва, ул. Ленина, 1', '123-456-7890', 'ivan.ivanov@example.com'),
+('Мария', 'Сидорова', '1985-10-20', 'Санкт-Петербург, Невский пр., 2', '987-654-3210', 'maria.sidorova@example.com');
+
+-- Заполнение таблицы Accounts
+INSERT INTO Accounts (ClientID, AccountNumber, AccountType, Currency, Balance, OpenDate) VALUES
+(1, '12345678901234567890', 'Дебетовый', 'RUB', 10000.00, '2023-12-28 09:00:00'),
+(2, '09876543210987654321', 'Кредитный', 'RUB', -5000.00, '2023-12-28 10:00:00');
+
+-- Заполнение таблицы TransactionTypes
+INSERT INTO TransactionTypes (TypeName, Description) VALUES
+('Пополнение', 'Пополнение счета'),
+('Снятие', 'Снятие средств со счета'),
+('Перевод', 'Перевод средств на другой счет');
+
+-- Заполнение таблицы Transactions
+INSERT INTO Transactions (AccountID, TransactionTypeID, TransactionDate, Amount, Description) VALUES
+(1, 1, '2023-12-28 10:30:00', 5000.00, 'Пополнение через банкомат'),
+(2, 2, '2023-12-28 11:00:00', 2000.00, 'Снятие наличных в отделении');

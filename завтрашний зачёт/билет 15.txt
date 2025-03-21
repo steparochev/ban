@@ -1,0 +1,200 @@
+Билет №15
+1.	Разработать структуру базы данных учёта продажи авиабилетов в СУБД MySQL;
+2.	Разработать структуру базы данных учёта продажи авиабилетов в СУБД PostgreSQL;
+3.	Заполнить таблицы тестовым набором данных.
+
+111111111111111111111111111111111111.
+-- Создание базы данных
+CREATE DATABASE IF NOT EXISTS air_ticket_sales;
+
+-- Использование базы данных
+USE air_ticket_sales;
+
+-- Таблица: Авиакомпании (Airlines)
+CREATE TABLE Airlines (
+    AirlineID INT PRIMARY KEY AUTO_INCREMENT,
+    AirlineName VARCHAR(255) NOT NULL,
+    IATA_Code VARCHAR(2) UNIQUE,
+    ICAO_Code VARCHAR(3) UNIQUE
+);
+
+-- Таблица: Аэропорты (Airports)
+CREATE TABLE Airports (
+    AirportID INT PRIMARY KEY AUTO_INCREMENT,
+    AirportName VARCHAR(255) NOT NULL,
+    City VARCHAR(255) NOT NULL,
+    Country VARCHAR(255) NOT NULL,
+    IATA_Code VARCHAR(3) UNIQUE,
+    ICAO_Code VARCHAR(4) UNIQUE
+);
+
+-- Таблица: Рейсы (Flights)
+CREATE TABLE Flights (
+    FlightID INT PRIMARY KEY AUTO_INCREMENT,
+    AirlineID INT NOT NULL,
+    DepartureAirportID INT NOT NULL,
+    ArrivalAirportID INT NOT NULL,
+    DepartureTime DATETIME NOT NULL,
+    ArrivalTime DATETIME NOT NULL,
+    FlightNumber VARCHAR(20) NOT NULL,
+    FOREIGN KEY (AirlineID) REFERENCES Airlines(AirlineID),
+    FOREIGN KEY (DepartureAirportID) REFERENCES Airports(AirportID),
+    FOREIGN KEY (ArrivalAirportID) REFERENCES Airports(AirportID)
+);
+
+-- Таблица: Классы обслуживания (CabinClasses)
+CREATE TABLE CabinClasses (
+    CabinClassID INT PRIMARY KEY AUTO_INCREMENT,
+    ClassName VARCHAR(50) NOT NULL,
+    Description TEXT
+);
+
+-- Таблица: Тарифы (Fares)
+CREATE TABLE Fares (
+    FareID INT PRIMARY KEY AUTO_INCREMENT,
+    FlightID INT NOT NULL,
+    CabinClassID INT NOT NULL,
+    Price DECIMAL(10, 2) NOT NULL,
+    Availability INT NOT NULL,  -- Количество доступных мест
+    FOREIGN KEY (FlightID) REFERENCES Flights(FlightID),
+    FOREIGN KEY (CabinClassID) REFERENCES CabinClasses(CabinClassID)
+);
+
+-- Таблица: Пассажиры (Passengers)
+CREATE TABLE Passengers (
+    PassengerID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    DateOfBirth DATE,
+    PassportNumber VARCHAR(20) UNIQUE
+);
+
+-- Таблица: Билеты (Tickets)
+CREATE TABLE Tickets (
+    TicketID INT PRIMARY KEY AUTO_INCREMENT,
+    FareID INT NOT NULL,
+    PassengerID INT NOT NULL,
+    BookingDate DATETIME NOT NULL,
+    TicketNumber VARCHAR(20) UNIQUE NOT NULL,
+    FOREIGN KEY (FareID) REFERENCES Fares(FareID),
+    FOREIGN KEY (PassengerID) REFERENCES Passengers(PassengerID)
+);
+
+
+222222222222222222222222222222222222222222222222222
+-- Создание базы данных
+CREATE DATABASE air_ticket_sales;
+
+-- Подключение к базе данных
+\c air_ticket_sales
+
+-- Таблица: Авиакомпании (Airlines)
+CREATE TABLE Airlines (
+    AirlineID SERIAL PRIMARY KEY,
+    AirlineName VARCHAR(255) NOT NULL,
+    IATA_Code VARCHAR(2) UNIQUE,
+    ICAO_Code VARCHAR(3) UNIQUE
+);
+
+-- Таблица: Аэропорты (Airports)
+CREATE TABLE Airports (
+    AirportID SERIAL PRIMARY KEY,
+    AirportName VARCHAR(255) NOT NULL,
+    City VARCHAR(255) NOT NULL,
+    Country VARCHAR(255) NOT NULL,
+    IATA_Code VARCHAR(3) UNIQUE,
+    ICAO_Code VARCHAR(4) UNIQUE
+);
+
+-- Таблица: Рейсы (Flights)
+CREATE TABLE Flights (
+    FlightID SERIAL PRIMARY KEY,
+    AirlineID INT NOT NULL,
+    DepartureAirportID INT NOT NULL,
+    ArrivalAirportID INT NOT NULL,
+    DepartureTime TIMESTAMP NOT NULL,
+    ArrivalTime TIMESTAMP NOT NULL,
+    FlightNumber VARCHAR(20) NOT NULL,
+    FOREIGN KEY (AirlineID) REFERENCES Airlines(AirlineID),
+    FOREIGN KEY (DepartureAirportID) REFERENCES Airports(AirportID),
+    FOREIGN KEY (ArrivalAirportID) REFERENCES Airports(AirportID)
+);
+
+-- Таблица: Классы обслуживания (CabinClasses)
+CREATE TABLE CabinClasses (
+    CabinClassID SERIAL PRIMARY KEY,
+    ClassName VARCHAR(50) NOT NULL,
+    Description TEXT
+);
+
+-- Таблица: Тарифы (Fares)
+CREATE TABLE Fares (
+    FareID SERIAL PRIMARY KEY,
+    FlightID INT NOT NULL,
+    CabinClassID INT NOT NULL,
+    Price DECIMAL(10, 2) NOT NULL,
+    Availability INT NOT NULL,  -- Количество доступных мест
+    FOREIGN KEY (FlightID) REFERENCES Flights(FlightID),
+    FOREIGN KEY (CabinClassID) REFERENCES CabinClasses(CabinClassID)
+);
+
+-- Таблица: Пассажиры (Passengers)
+CREATE TABLE Passengers (
+    PassengerID SERIAL PRIMARY KEY,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    DateOfBirth DATE,
+    PassportNumber VARCHAR(20) UNIQUE
+);
+
+-- Таблица: Билеты (Tickets)
+CREATE TABLE Tickets (
+    TicketID SERIAL PRIMARY KEY,
+    FareID INT NOT NULL,
+    PassengerID INT NOT NULL,
+    BookingDate TIMESTAMP NOT NULL,
+    TicketNumber VARCHAR(20) UNIQUE NOT NULL,
+    FOREIGN KEY (FareID) REFERENCES Fares(FareID),
+    FOREIGN KEY (PassengerID) REFERENCES Passengers(PassengerID)
+);
+33333333333333333333333333333333333333333
+-- Заполнение таблицы Airlines
+INSERT INTO Airlines (AirlineName, IATA_Code, ICAO_Code) VALUES
+('Air Canada', 'AC', 'ACA'),
+('United Airlines', 'UA', 'UAL'),
+('Lufthansa', 'LH', 'DLH');
+
+-- Заполнение таблицы Airports
+INSERT INTO Airports (AirportName, City, Country, IATA_Code, ICAO_Code) VALUES
+('Toronto Pearson International Airport', 'Toronto', 'Canada', 'YYZ', 'CYYZ'),
+('Chicago O\'Hare International Airport', 'Chicago', 'USA', 'ORD', 'KORD'),
+('Frankfurt Airport', 'Frankfurt', 'Germany', 'FRA', 'EDDF');
+
+-- Заполнение таблицы Flights
+INSERT INTO Flights (AirlineID, DepartureAirportID, ArrivalAirportID, DepartureTime, ArrivalTime, FlightNumber) VALUES
+(1, 1, 2, '2023-12-25 10:00:00', '2023-12-25 11:30:00', 'AC123'),
+(2, 2, 3, '2023-12-26 14:00:00', '2023-12-26 20:00:00', 'UA456'),
+(3, 3, 1, '2023-12-27 08:00:00', '2023-12-27 11:00:00', 'LH789');
+
+-- Заполнение таблицы CabinClasses
+INSERT INTO CabinClasses (ClassName, Description) VALUES
+('Economy', 'Basic economy class'),
+('Business', 'Business class with more legroom and amenities'),
+('First Class', 'Luxury first class experience');
+
+-- Заполнение таблицы Fares
+INSERT INTO Fares (FlightID, CabinClassID, Price, Availability) VALUES
+(1, 1, 200.00, 50),
+(1, 2, 500.00, 20),
+(2, 1, 300.00, 40),
+(3, 2, 600.00, 15);
+
+-- Заполнение таблицы Passengers
+INSERT INTO Passengers (FirstName, LastName, DateOfBirth, PassportNumber) VALUES
+('John', 'Doe', '1990-05-15', 'AB123456'),
+('Jane', 'Smith', '1985-10-20', 'CD789012');
+
+-- Заполнение таблицы Tickets
+INSERT INTO Tickets (FareID, PassengerID, BookingDate, TicketNumber) VALUES
+(1, 1, '2023-12-20 12:00:00', 'TK123456789'),
+(3, 2, '2023-12-21 15:00:00', 'TK987654321');

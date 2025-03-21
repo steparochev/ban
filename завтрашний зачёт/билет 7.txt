@@ -1,0 +1,194 @@
+Билет №7
+1.	Разработать структуру базы данных риэлтерского агентства в СУБД MySQL;
+2.	Разработать структуру базы данных риэлтерского агентства в СУБД PostgreSQL;
+3.	Заполнить таблицы тестовым набором данных.
+
+1111111111111111111111111111
+-- Создание базы данных
+CREATE DATABASE IF NOT EXISTS real_estate_agency;
+
+-- Использование базы данных
+USE real_estate_agency;
+
+-- Таблица: Агенты (Agents)
+CREATE TABLE Agents (
+    AgentID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    PhoneNumber VARCHAR(20),
+    Email VARCHAR(255),
+    CommissionRate DECIMAL(5,2) -- Процент комиссии
+);
+
+-- Таблица: Типы недвижимости (PropertyTypes)
+CREATE TABLE PropertyTypes (
+    PropertyTypeID INT PRIMARY KEY AUTO_INCREMENT,
+    TypeName VARCHAR(255) NOT NULL
+);
+
+-- Таблица: Объекты недвижимости (Properties)
+CREATE TABLE Properties (
+    PropertyID INT PRIMARY KEY AUTO_INCREMENT,
+    PropertyTypeID INT NOT NULL,
+    AgentID INT NOT NULL,
+    Address VARCHAR(255) NOT NULL,
+    City VARCHAR(255) NOT NULL,
+    State VARCHAR(255),
+    ZipCode VARCHAR(10),
+    Price DECIMAL(15, 2) NOT NULL,
+    Bedrooms INT,
+    Bathrooms DECIMAL(3, 1),
+    SquareFootage INT,
+    Description TEXT,
+    ConstructionYear INT,
+    Available BOOLEAN, -- Доступно для продажи/аренды
+    FOREIGN KEY (PropertyTypeID) REFERENCES PropertyTypes(PropertyTypeID),
+    FOREIGN KEY (AgentID) REFERENCES Agents(AgentID)
+);
+
+-- Таблица: Изображения недвижимости (PropertyImages)
+CREATE TABLE PropertyImages (
+    ImageID INT PRIMARY KEY AUTO_INCREMENT,
+    PropertyID INT NOT NULL,
+    ImageURL VARCHAR(255) NOT NULL, -- URL изображения
+    Description TEXT,
+    FOREIGN KEY (PropertyID) REFERENCES Properties(PropertyID)
+);
+
+-- Таблица: Клиенты (Clients)
+CREATE TABLE Clients (
+    ClientID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    PhoneNumber VARCHAR(20),
+    Email VARCHAR(255),
+    DesiredPropertyTypeID INT,
+    MaxPrice DECIMAL(15,2),
+    FOREIGN KEY (DesiredPropertyTypeID) REFERENCES PropertyTypes(PropertyTypeID)
+);
+
+-- Таблица: Показы (Viewings)
+CREATE TABLE Viewings (
+    ViewingID INT PRIMARY KEY AUTO_INCREMENT,
+    PropertyID INT NOT NULL,
+    ClientID INT NOT NULL,
+    AgentID INT NOT NULL,
+    ViewingDate DATETIME NOT NULL,
+    Feedback TEXT,
+    FOREIGN KEY (PropertyID) REFERENCES Properties(PropertyID),
+    FOREIGN KEY (ClientID) REFERENCES Clients(ClientID),
+    FOREIGN KEY (AgentID) REFERENCES Agents(AgentID)
+);
+
+22222222222222222222222222222222222222222
+-- Создание базы данных
+CREATE DATABASE real_estate_agency;
+
+-- Подключение к базе данных
+\c real_estate_agency
+
+-- Таблица: Агенты (Agents)
+CREATE TABLE Agents (
+    AgentID SERIAL PRIMARY KEY,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    PhoneNumber VARCHAR(20),
+    Email VARCHAR(255),
+    CommissionRate DECIMAL(5,2) -- Процент комиссии
+);
+
+-- Таблица: Типы недвижимости (PropertyTypes)
+CREATE TABLE PropertyTypes (
+    PropertyTypeID SERIAL PRIMARY KEY,
+    TypeName VARCHAR(255) NOT NULL
+);
+
+-- Таблица: Объекты недвижимости (Properties)
+CREATE TABLE Properties (
+    PropertyID SERIAL PRIMARY KEY,
+    PropertyTypeID INT NOT NULL,
+    AgentID INT NOT NULL,
+    Address VARCHAR(255) NOT NULL,
+    City VARCHAR(255) NOT NULL,
+    State VARCHAR(255),
+    ZipCode VARCHAR(10),
+    Price DECIMAL(15, 2) NOT NULL,
+    Bedrooms INT,
+    Bathrooms DECIMAL(3, 1),
+    SquareFootage INT,
+    Description TEXT,
+    ConstructionYear INT,
+    Available BOOLEAN, -- Доступно для продажи/аренды
+    FOREIGN KEY (PropertyTypeID) REFERENCES PropertyTypes(PropertyTypeID),
+    FOREIGN KEY (AgentID) REFERENCES Agents(AgentID)
+);
+
+-- Таблица: Изображения недвижимости (PropertyImages)
+CREATE TABLE PropertyImages (
+    ImageID SERIAL PRIMARY KEY,
+    PropertyID INT NOT NULL,
+    ImageURL VARCHAR(255) NOT NULL, -- URL изображения
+    Description TEXT,
+    FOREIGN KEY (PropertyID) REFERENCES Properties(PropertyID)
+);
+
+-- Таблица: Клиенты (Clients)
+CREATE TABLE Clients (
+    ClientID SERIAL PRIMARY KEY,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    PhoneNumber VARCHAR(20),
+    Email VARCHAR(255),
+    DesiredPropertyTypeID INT,
+    MaxPrice DECIMAL(15,2),
+    FOREIGN KEY (DesiredPropertyTypeID) REFERENCES PropertyTypes(PropertyTypeID)
+);
+
+-- Таблица: Показы (Viewings)
+CREATE TABLE Viewings (
+    ViewingID SERIAL PRIMARY KEY,
+    PropertyID INT NOT NULL,
+    ClientID INT NOT NULL,
+    AgentID INT NOT NULL,
+    ViewingDate TIMESTAMP NOT NULL, -- TIMESTAMP для даты и времени
+    Feedback TEXT,
+    FOREIGN KEY (PropertyID) REFERENCES Properties(PropertyID),
+    FOREIGN KEY (ClientID) REFERENCES Clients(ClientID),
+    FOREIGN KEY (AgentID) REFERENCES Agents(AgentID)
+);
+
+33333333333333333333333333333333333
+-- Заполнение таблицы PropertyTypes
+INSERT INTO PropertyTypes (TypeName) VALUES
+('Дом'),
+('Квартира'),
+('Таунхаус'),
+('Участок');
+
+-- Заполнение таблицы Agents
+INSERT INTO Agents (FirstName, LastName, PhoneNumber, Email, CommissionRate) VALUES
+('Иван', 'Иванов', '123-456-7890', 'ivan.ivanov@example.com', 3.0),
+('Петр', 'Петров', '987-654-3210', 'petr.petrov@example.com', 2.5);
+
+-- Заполнение таблицы Properties
+INSERT INTO Properties (PropertyTypeID, AgentID, Address, City, State, ZipCode, Price, Bedrooms, Bathrooms, SquareFootage, Description, ConstructionYear, Available) VALUES
+(1, 1, '123 Main St', 'Anytown', 'CA', '91234', 500000.00, 3, 2.0, 1500, 'Уютный дом с садом', 1980, TRUE),
+(2, 2, '456 Oak Ave', 'Springfield', 'IL', '62704', 250000.00, 2, 1.0, 800, 'Небольшая квартира в центре города', 2005, TRUE),
+(3, 1, '789 Pine Ln', 'Hill Valley', 'CA', '95420', 750000.00, 4, 3.5, 2200, 'Просторный таунхаус с гаражом', 2015, TRUE);
+
+-- Заполнение таблицы PropertyImages
+INSERT INTO PropertyImages (PropertyID, ImageURL, Description) VALUES
+(1, 'https://example.com/image1.jpg', 'Фасад дома'),
+(1, 'https://example.com/image2.jpg', 'Гостиная'),
+(2, 'https://example.com/image3.jpg', 'Вид из окна'),
+(3, 'https://example.com/image4.jpg', 'Кухня');
+
+-- Заполнение таблицы Clients
+INSERT INTO Clients (FirstName, LastName, PhoneNumber, Email, DesiredPropertyTypeID, MaxPrice) VALUES
+('Мария', 'Сидорова', '555-123-4567', 'maria.sidorova@example.com', 1, 600000.00),
+('Алексей', 'Смирнов', '555-987-6543', 'alexey.smirnov@example.com', 2, 300000.00);
+
+-- Заполнение таблицы Viewings
+INSERT INTO Viewings (PropertyID, ClientID, AgentID, ViewingDate, Feedback) VALUES
+(1, 1, 1, '2023-12-28 10:00:00', 'Хорошее расположение, но нужен ремонт'),
+(2, 2, 2, '2023-12-29 14:00:00', 'Слишком маленькая площадь');

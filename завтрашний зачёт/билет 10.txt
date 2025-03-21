@@ -1,0 +1,200 @@
+Билет №10
+1.	Разработать структуру базы данных медицинских карт в СУБД MySQL;
+2.	Разработать структуру базы данных медицинских карт в СУБД PostgreSQL;
+3.	Заполнить таблицы тестовым набором данных.
+
+11111111111111111111111111111111111
+-- Создание базы данных
+CREATE DATABASE IF NOT EXISTS medical_records;
+
+-- Использование базы данных
+USE medical_records;
+
+-- Таблица: Пациенты (Patients)
+CREATE TABLE Patients (
+    PatientID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    DateOfBirth DATE,
+    Gender ENUM('Мужской', 'Женский', 'Другое'),
+    Address VARCHAR(255),
+    PhoneNumber VARCHAR(20),
+    Email VARCHAR(255)
+);
+
+-- Таблица: Врачи (Doctors)
+CREATE TABLE Doctors (
+    DoctorID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    Specialty VARCHAR(255),
+    PhoneNumber VARCHAR(20),
+    Email VARCHAR(255)
+);
+
+-- Таблица: Посещения (Visits)
+CREATE TABLE Visits (
+    VisitID INT PRIMARY KEY AUTO_INCREMENT,
+    PatientID INT NOT NULL,
+    DoctorID INT NOT NULL,
+    VisitDate DATETIME NOT NULL,
+    Complaint TEXT, -- Жалобы пациента
+    Diagnosis TEXT, -- Диагноз
+    Treatment TEXT, -- Лечение
+    FOREIGN KEY (PatientID) REFERENCES Patients(PatientID),
+    FOREIGN KEY (DoctorID) REFERENCES Doctors(DoctorID)
+);
+
+-- Таблица: Анализы (Tests)
+CREATE TABLE Tests (
+    TestID INT PRIMARY KEY AUTO_INCREMENT,
+    TestName VARCHAR(255) NOT NULL,
+    Description TEXT
+);
+
+-- Таблица: Результаты анализов (TestResults)
+CREATE TABLE TestResults (
+    TestResultID INT PRIMARY KEY AUTO_INCREMENT,
+    VisitID INT NOT NULL,
+    TestID INT NOT NULL,
+    Result TEXT, -- Результат анализа
+    ResultDate DATE,
+    FOREIGN KEY (VisitID) REFERENCES Visits(VisitID),
+    FOREIGN KEY (TestID) REFERENCES Tests(TestID)
+);
+
+-- Таблица: Лекарства (Medications)
+CREATE TABLE Medications (
+    MedicationID INT PRIMARY KEY AUTO_INCREMENT,
+    MedicationName VARCHAR(255) NOT NULL,
+    Description TEXT
+);
+
+-- Таблица: Назначения лекарств (Prescriptions)
+CREATE TABLE Prescriptions (
+    PrescriptionID INT PRIMARY KEY AUTO_INCREMENT,
+    VisitID INT NOT NULL,
+    MedicationID INT NOT NULL,
+    Dosage VARCHAR(255), -- Дозировка
+    Frequency VARCHAR(255), -- Частота приема
+    StartDate DATE,
+    EndDate DATE,
+    FOREIGN KEY (VisitID) REFERENCES Visits(VisitID),
+    FOREIGN KEY (MedicationID) REFERENCES Medications(MedicationID)
+);
+
+2222222222222222222222222222222222222222222
+-- Создание базы данных
+CREATE DATABASE medical_records;
+
+-- Подключение к базе данных
+\c medical_records
+
+-- Таблица: Пациенты (Patients)
+CREATE TABLE Patients (
+    PatientID SERIAL PRIMARY KEY,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    DateOfBirth DATE,
+    Gender VARCHAR(20) CHECK (Gender IN ('Мужской', 'Женский', 'Другое')),
+    Address VARCHAR(255),
+    PhoneNumber VARCHAR(20),
+    Email VARCHAR(255)
+);
+
+-- Таблица: Врачи (Doctors)
+CREATE TABLE Doctors (
+    DoctorID SERIAL PRIMARY KEY,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    Specialty VARCHAR(255),
+    PhoneNumber VARCHAR(20),
+    Email VARCHAR(255)
+);
+
+-- Таблица: Посещения (Visits)
+CREATE TABLE Visits (
+    VisitID SERIAL PRIMARY KEY,
+    PatientID INT NOT NULL,
+    DoctorID INT NOT NULL,
+    VisitDate TIMESTAMP NOT NULL,
+    Complaint TEXT, -- Жалобы пациента
+    Diagnosis TEXT, -- Диагноз
+    Treatment TEXT, -- Лечение
+    FOREIGN KEY (PatientID) REFERENCES Patients(PatientID),
+    FOREIGN KEY (DoctorID) REFERENCES Doctors(DoctorID)
+);
+
+-- Таблица: Анализы (Tests)
+CREATE TABLE Tests (
+    TestID SERIAL PRIMARY KEY,
+    TestName VARCHAR(255) NOT NULL,
+    Description TEXT
+);
+
+-- Таблица: Результаты анализов (TestResults)
+CREATE TABLE TestResults (
+    TestResultID SERIAL PRIMARY KEY,
+    VisitID INT NOT NULL,
+    TestID INT NOT NULL,
+    Result TEXT, -- Результат анализа
+    ResultDate DATE,
+    FOREIGN KEY (VisitID) REFERENCES Visits(VisitID),
+    FOREIGN KEY (TestID) REFERENCES Tests(TestID)
+);
+
+-- Таблица: Лекарства (Medications)
+CREATE TABLE Medications (
+    MedicationID SERIAL PRIMARY KEY,
+    MedicationName VARCHAR(255) NOT NULL,
+    Description TEXT
+);
+
+-- Таблица: Назначения лекарств (Prescriptions)
+CREATE TABLE Prescriptions (
+    PrescriptionID SERIAL PRIMARY KEY,
+    VisitID INT NOT NULL,
+    MedicationID INT NOT NULL,
+    Dosage VARCHAR(255), -- Дозировка
+    Frequency VARCHAR(255), -- Частота приема
+    StartDate DATE,
+    EndDate DATE,
+    FOREIGN KEY (VisitID) REFERENCES Visits(VisitID),
+    FOREIGN KEY (MedicationID) REFERENCES Medications(MedicationID)
+);
+
+333333333333333333333333333333333333333333333
+-- Заполнение таблицы Patients
+INSERT INTO Patients (FirstName, LastName, DateOfBirth, Gender, Address, PhoneNumber, Email) VALUES
+('Иван', 'Иванов', '1990-05-15', 'Мужской', 'Москва, ул. Ленина, 1', '123-456-7890', 'ivan.ivanov@example.com'),
+('Мария', 'Сидорова', '1985-10-20', 'Женский', 'Санкт-Петербург, Невский пр., 2', '987-654-3210', 'maria.sidorova@example.com');
+
+-- Заполнение таблицы Doctors
+INSERT INTO Doctors (FirstName, LastName, Specialty, PhoneNumber, Email) VALUES
+('Сергей', 'Сергеев', 'Терапевт', '555-123-4567', 'sergey.sergeev@example.com'),
+('Елена', 'Петрова', 'Кардиолог', '555-987-6543', 'elena.petrova@example.com');
+
+-- Заполнение таблицы Visits
+INSERT INTO Visits (PatientID, DoctorID, VisitDate, Complaint, Diagnosis, Treatment) VALUES
+(1, 1, '2023-12-27 10:00:00', 'Головная боль', 'Мигрень', 'Обезболивающее'),
+(2, 2, '2023-12-27 11:00:00', 'Боль в груди', 'Стенокардия', 'Нитроглицерин');
+
+-- Заполнение таблицы Tests
+INSERT INTO Tests (TestName, Description) VALUES
+('Общий анализ крови', 'Определение основных показателей крови'),
+('ЭКГ', 'Электрокардиограмма');
+
+-- Заполнение таблицы TestResults
+INSERT INTO TestResults (VisitID, TestID, Result, ResultDate) VALUES
+(1, 1, 'Норма', '2023-12-28'),
+(2, 2, 'Нарушения ритма', '2023-12-28');
+
+-- Заполнение таблицы Medications
+INSERT INTO Medications (MedicationName, Description) VALUES
+('Анальгин', 'Обезболивающее средство'),
+('Нитроглицерин', 'Сосудорасширяющее средство');
+
+-- Заполнение таблицы Prescriptions
+INSERT INTO Prescriptions (VisitID, MedicationID, Dosage, Frequency, StartDate, EndDate) VALUES
+(1, 1, '1 таблетка', '3 раза в день', '2023-12-27', '2023-12-31'),
+(2, 2, '0.4 мг', 'При болях', '2023-12-27', NULL);

@@ -1,0 +1,197 @@
+Билет №8
+1.	Разработать структуру базы данных автосалона в СУБД MySQL;
+2.	Разработать структуру базы данных автосалона в СУБД PostgreSQL;
+3.	Заполнить таблицы тестовым набором данных.
+
+111111111111111111111111111
+-- Создание базы данных
+CREATE DATABASE IF NOT EXISTS car_dealership;
+
+-- Использование базы данных
+USE car_dealership;
+
+-- Таблица: Производители (Manufacturers)
+CREATE TABLE Manufacturers (
+    ManufacturerID INT PRIMARY KEY AUTO_INCREMENT,
+    ManufacturerName VARCHAR(255) NOT NULL,
+    Country VARCHAR(255)
+);
+
+-- Таблица: Модели (Models)
+CREATE TABLE Models (
+    ModelID INT PRIMARY KEY AUTO_INCREMENT,
+    ManufacturerID INT NOT NULL,
+    ModelName VARCHAR(255) NOT NULL,
+    BodyType VARCHAR(255), -- Седан, Хэтчбек, Кроссовер и т.д.
+    FOREIGN KEY (ManufacturerID) REFERENCES Manufacturers(ManufacturerID)
+);
+
+-- Таблица: Автомобили (Cars)
+CREATE TABLE Cars (
+    CarID INT PRIMARY KEY AUTO_INCREMENT,
+    ModelID INT NOT NULL,
+    Year INT,
+    EngineType VARCHAR(255), -- Бензин, Дизель, Электро, Гибрид
+    EngineDisplacement DECIMAL(3, 1), -- Объем двигателя
+    Transmission VARCHAR(255), -- Автомат, Механика
+    Color VARCHAR(255),
+    Mileage INT,
+    Price DECIMAL(15, 2) NOT NULL,
+    VIN VARCHAR(17) UNIQUE, -- Уникальный VIN-код
+    Availability BOOLEAN, -- В наличии или продано
+    FOREIGN KEY (ModelID) REFERENCES Models(ModelID)
+);
+
+-- Таблица: Клиенты (Clients)
+CREATE TABLE Clients (
+    ClientID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    PhoneNumber VARCHAR(20),
+    Email VARCHAR(255),
+    Address VARCHAR(255)
+);
+
+-- Таблица: Продажи (Sales)
+CREATE TABLE Sales (
+    SaleID INT PRIMARY KEY AUTO_INCREMENT,
+    CarID INT NOT NULL,
+    ClientID INT NOT NULL,
+    SaleDate DATETIME NOT NULL,
+    SalePrice DECIMAL(15, 2) NOT NULL,
+    FOREIGN KEY (CarID) REFERENCES Cars(CarID),
+    FOREIGN KEY (ClientID) REFERENCES Clients(ClientID)
+);
+
+-- Таблица: Опции (Options)
+CREATE TABLE Options (
+    OptionID INT PRIMARY KEY AUTO_INCREMENT,
+    OptionName VARCHAR(255) NOT NULL,
+    Description TEXT
+);
+
+-- Таблица: Связь автомобилей и опций (CarOptions)
+CREATE TABLE CarOptions (
+    CarID INT NOT NULL,
+    OptionID INT NOT NULL,
+    PRIMARY KEY (CarID, OptionID), -- Составной ключ
+    FOREIGN KEY (CarID) REFERENCES Cars(CarID),
+    FOREIGN KEY (OptionID) REFERENCES Options(OptionID)
+);
+
+
+2222222222222222222222222222222222222222
+-- Создание базы данных
+CREATE DATABASE IF NOT EXISTS car_dealership;
+
+-- Использование базы данных
+USE car_dealership;
+
+-- Таблица: Производители (Manufacturers)
+CREATE TABLE Manufacturers (
+    ManufacturerID INT PRIMARY KEY AUTO_INCREMENT,
+    ManufacturerName VARCHAR(255) NOT NULL,
+    Country VARCHAR(255)
+);
+
+-- Таблица: Модели (Models)
+CREATE TABLE Models (
+    ModelID INT PRIMARY KEY AUTO_INCREMENT,
+    ManufacturerID INT NOT NULL,
+    ModelName VARCHAR(255) NOT NULL,
+    BodyType VARCHAR(255), -- Седан, Хэтчбек, Кроссовер и т.д.
+    FOREIGN KEY (ManufacturerID) REFERENCES Manufacturers(ManufacturerID)
+);
+
+-- Таблица: Автомобили (Cars)
+CREATE TABLE Cars (
+    CarID INT PRIMARY KEY AUTO_INCREMENT,
+    ModelID INT NOT NULL,
+    Year INT,
+    EngineType VARCHAR(255), -- Бензин, Дизель, Электро, Гибрид
+    EngineDisplacement DECIMAL(3, 1), -- Объем двигателя
+    Transmission VARCHAR(255), -- Автомат, Механика
+    Color VARCHAR(255),
+    Mileage INT,
+    Price DECIMAL(15, 2) NOT NULL,
+    VIN VARCHAR(17) UNIQUE, -- Уникальный VIN-код
+    Availability BOOLEAN, -- В наличии или продано
+    FOREIGN KEY (ModelID) REFERENCES Models(ModelID)
+);
+
+-- Таблица: Клиенты (Clients)
+CREATE TABLE Clients (
+    ClientID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    PhoneNumber VARCHAR(20),
+    Email VARCHAR(255),
+    Address VARCHAR(255)
+);
+
+-- Таблица: Продажи (Sales)
+CREATE TABLE Sales (
+    SaleID INT PRIMARY KEY AUTO_INCREMENT,
+    CarID INT NOT NULL,
+    ClientID INT NOT NULL,
+    SaleDate DATETIME NOT NULL,
+    SalePrice DECIMAL(15, 2) NOT NULL,
+    FOREIGN KEY (CarID) REFERENCES Cars(CarID),
+    FOREIGN KEY (ClientID) REFERENCES Clients(ClientID)
+);
+
+-- Таблица: Опции (Options)
+CREATE TABLE Options (
+    OptionID INT PRIMARY KEY AUTO_INCREMENT,
+    OptionName VARCHAR(255) NOT NULL,
+    Description TEXT
+);
+
+-- Таблица: Связь автомобилей и опций (CarOptions)
+CREATE TABLE CarOptions (
+    CarID INT NOT NULL,
+    OptionID INT NOT NULL,
+    PRIMARY KEY (CarID, OptionID), -- Составной ключ
+    FOREIGN KEY (CarID) REFERENCES Cars(CarID),
+    FOREIGN KEY (OptionID) REFERENCES Options(OptionID)
+);
+
+333333333333333333333333333333333333333
+-- Заполнение таблицы Manufacturers
+INSERT INTO Manufacturers (ManufacturerName, Country) VALUES
+('Toyota', 'Japan'),
+('Ford', 'USA'),
+('BMW', 'Germany');
+
+-- Заполнение таблицы Models
+INSERT INTO Models (ManufacturerID, ModelName, BodyType) VALUES
+(1, 'Camry', 'Sedan'),
+(2, 'F-150', 'Truck'),
+(3, 'X5', 'SUV');
+
+-- Заполнение таблицы Cars
+INSERT INTO Cars (ModelID, Year, EngineType, EngineDisplacement, Transmission, Color, Mileage, Price, VIN, Availability) VALUES
+(1, 2022, 'Gasoline', 2.5, 'Automatic', 'Silver', 15000, 28000.00, 'JTDKR4DU82056789', TRUE),
+(2, 2023, 'Gasoline', 3.5, 'Automatic', 'Black', 5000, 45000.00, '1FTFW1E37MF912345', TRUE),
+(3, 2021, 'Gasoline', 3.0, 'Automatic', 'White', 30000, 60000.00, '5UXKT9C08MB765432', FALSE);
+
+-- Заполнение таблицы Clients
+INSERT INTO Clients (FirstName, LastName, PhoneNumber, Email, Address) VALUES
+('Иван', 'Петров', '123-456-7890', 'ivan.petrov@example.com', '123 Main St, Anytown'),
+('Мария', 'Сидорова', '987-654-3210', 'maria.sidorova@example.com', '456 Oak Ave, Springfield');
+
+-- Заполнение таблицы Sales
+INSERT INTO Sales (CarID, ClientID, SaleDate, SalePrice) VALUES
+(3, 1, '2023-12-27 14:30:00', 58000.00);
+
+-- Заполнение таблицы Options
+INSERT INTO Options (OptionName, Description) VALUES
+('Leather Seats', 'Кожаные сиденья'),
+('Sunroof', 'Люк'),
+('Navigation System', 'Навигационная система');
+
+-- Заполнение таблицы CarOptions
+INSERT INTO CarOptions (CarID, OptionID) VALUES
+(1, 2),
+(3, 1),
+(3, 3);

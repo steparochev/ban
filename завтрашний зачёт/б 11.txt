@@ -1,0 +1,161 @@
+Билет №11
+1.	Разработать структуру базы данных записи на приём пациентов поликлиники в СУБД MySQL;
+2.	Разработать структуру базы данных записи на приём пациентов поликлиники в СУБД PostgreSQL;
+3.	Заполнить таблицы тестовым набором данных.
+
+111111111111111111111111111111111111111111111111111111
+-- Создание базы данных
+CREATE DATABASE IF NOT EXISTS clinic_appointments;
+
+-- Использование базы данных
+USE clinic_appointments;
+
+-- Таблица: Пациенты (Patients)
+CREATE TABLE Patients (
+    PatientID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    DateOfBirth DATE,
+    PhoneNumber VARCHAR(20),
+    Email VARCHAR(255)
+);
+
+-- Таблица: Врачи (Doctors)
+CREATE TABLE Doctors (
+    DoctorID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    Specialty VARCHAR(255),
+    Office VARCHAR(255) -- Номер кабинета
+);
+
+-- Таблица: Специализации (Specialties)
+CREATE TABLE Specialties (
+    SpecialtyID INT PRIMARY KEY AUTO_INCREMENT,
+    SpecialtyName VARCHAR(255) NOT NULL
+);
+
+--  Связь между врачами и специализациями
+CREATE TABLE DoctorSpecialties (
+    DoctorID INT NOT NULL,
+    SpecialtyID INT NOT NULL,
+    PRIMARY KEY (DoctorID, SpecialtyID),
+    FOREIGN KEY (DoctorID) REFERENCES Doctors(DoctorID),
+    FOREIGN KEY (SpecialtyID) REFERENCES Specialties(SpecialtyID)
+);
+
+-- Таблица: Расписание (Schedule)
+CREATE TABLE Schedule (
+    ScheduleID INT PRIMARY KEY AUTO_INCREMENT,
+    DoctorID INT NOT NULL,
+    AppointmentDate DATE NOT NULL,
+    StartTime TIME NOT NULL,
+    EndTime TIME NOT NULL,
+    FOREIGN KEY (DoctorID) REFERENCES Doctors(DoctorID)
+);
+
+-- Таблица: Записи на прием (Appointments)
+CREATE TABLE Appointments (
+    AppointmentID INT PRIMARY KEY AUTO_INCREMENT,
+    PatientID INT NOT NULL,
+    ScheduleID INT NOT NULL,
+    AppointmentTime DATETIME NOT NULL,
+    Reason TEXT, -- Причина обращения
+    Status ENUM('Запланировано', 'Подтверждено', 'Отменено', 'Выполнено'),
+    FOREIGN KEY (PatientID) REFERENCES Patients(PatientID),
+    FOREIGN KEY (ScheduleID) REFERENCES Schedule(ScheduleID)
+);
+
+22222222222222222222222222222222222222222222222
+-- Создание базы данных
+CREATE DATABASE clinic_appointments;
+
+-- Подключение к базе данных
+\c clinic_appointments
+
+-- Таблица: Пациенты (Patients)
+CREATE TABLE Patients (
+    PatientID SERIAL PRIMARY KEY,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    DateOfBirth DATE,
+    PhoneNumber VARCHAR(20),
+    Email VARCHAR(255)
+);
+
+-- Таблица: Врачи (Doctors)
+CREATE TABLE Doctors (
+    DoctorID SERIAL PRIMARY KEY,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    Specialty VARCHAR(255),
+    Office VARCHAR(255) -- Номер кабинета
+);
+
+-- Таблица: Специализации (Specialties)
+CREATE TABLE Specialties (
+    SpecialtyID SERIAL PRIMARY KEY,
+    SpecialtyName VARCHAR(255) NOT NULL
+);
+
+--  Связь между врачами и специализациями
+CREATE TABLE DoctorSpecialties (
+    DoctorID INT NOT NULL,
+    SpecialtyID INT NOT NULL,
+    PRIMARY KEY (DoctorID, SpecialtyID),
+    FOREIGN KEY (DoctorID) REFERENCES Doctors(DoctorID),
+    FOREIGN KEY (SpecialtyID) REFERENCES Specialties(SpecialtyID)
+);
+
+-- Таблица: Расписание (Schedule)
+CREATE TABLE Schedule (
+    ScheduleID SERIAL PRIMARY KEY,
+    DoctorID INT NOT NULL,
+    AppointmentDate DATE NOT NULL,
+    StartTime TIME NOT NULL,
+    EndTime TIME NOT NULL,
+    FOREIGN KEY (DoctorID) REFERENCES Doctors(DoctorID)
+);
+
+-- Таблица: Записи на прием (Appointments)
+CREATE TABLE Appointments (
+    AppointmentID SERIAL PRIMARY KEY,
+    PatientID INT NOT NULL,
+    ScheduleID INT NOT NULL,
+    AppointmentTime TIMESTAMP NOT NULL,
+    Reason TEXT, -- Причина обращения
+    Status VARCHAR(20) CHECK (Status IN ('Запланировано', 'Подтверждено', 'Отменено', 'Выполнено')),
+    FOREIGN KEY (PatientID) REFERENCES Patients(PatientID),
+    FOREIGN KEY (ScheduleID) REFERENCES Schedule(ScheduleID)
+);
+
+333333333333333333333333333333333333333333333
+-- Заполнение таблицы Patients
+INSERT INTO Patients (FirstName, LastName, DateOfBirth, PhoneNumber, Email) VALUES
+('Иван', 'Иванов', '1990-05-15', '123-456-7890', 'ivan.ivanov@example.com'),
+('Мария', 'Сидорова', '1985-10-20', '987-654-3210', 'maria.sidorova@example.com');
+
+-- Заполнение таблицы Doctors
+INSERT INTO Doctors (FirstName, LastName, Specialty, Office) VALUES
+('Сергей', 'Сергеев', 'Терапевт', '101'),
+('Елена', 'Петрова', 'Кардиолог', '202');
+
+-- Заполнение таблицы Specialties
+INSERT INTO Specialties (SpecialtyName) VALUES
+('Терапия'),
+('Кардиология');
+
+-- Заполнение таблицы DoctorSpecialties
+INSERT INTO DoctorSpecialties (DoctorID, SpecialtyID) VALUES
+(1, 1),
+(2, 2);
+
+-- Заполнение таблицы Schedule
+INSERT INTO Schedule (DoctorID, AppointmentDate, StartTime, EndTime) VALUES
+(1, '2023-12-28', '09:00:00', '12:00:00'),
+(2, '2023-12-28', '14:00:00', '17:00:00');
+
+-- Заполнение таблицы Appointments
+INSERT INTO Appointments (PatientID, ScheduleID, AppointmentTime, Reason, Status) VALUES
+(1, 1, '2023-12-28 09:30:00', 'Простуда', 'Запланировано'),
+(2, 2, '2023-12-28 14:30:00', 'Боль в сердце', 'Подтверждено');

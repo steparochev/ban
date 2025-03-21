@@ -1,0 +1,142 @@
+Билет №3
+1.	Разработать структуру базы данных курсовых проектов в СУБД MySQL;
+2.	Разработать структуру базы данных курсовых проектов в СУБД PostgreSQL;
+3.	Заполнить таблицы тестовым набором данных.
+
+
+111111111111111111111111111111111111111111111111.
+-- Создание базы данных
+CREATE DATABASE IF NOT EXISTS course_projects;
+
+-- Использование базы данных
+USE course_projects;
+
+-- Таблица: Студенты (Students)
+CREATE TABLE Students (
+    StudentID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    GroupID INT,  -- Ссылка на группу
+    FOREIGN KEY (GroupID) REFERENCES Groups(GroupID)
+);
+
+-- Таблица: Группы (Groups)
+CREATE TABLE Groups (
+    GroupID INT PRIMARY KEY AUTO_INCREMENT,
+    GroupName VARCHAR(50) NOT NULL,
+    Specialty VARCHAR(255)
+);
+
+-- Таблица: Преподаватели (Teachers)
+CREATE TABLE Teachers (
+    TeacherID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    Department VARCHAR(255)
+);
+
+-- Таблица: Предметы (Subjects)
+CREATE TABLE Subjects (
+    SubjectID INT PRIMARY KEY AUTO_INCREMENT,
+    SubjectName VARCHAR(255) NOT NULL
+);
+
+-- Таблица: Курсовые проекты (CourseProjects)
+CREATE TABLE CourseProjects (
+    ProjectID INT PRIMARY KEY AUTO_INCREMENT,
+    StudentID INT NOT NULL,
+    SubjectID INT NOT NULL,
+    TeacherID INT NOT NULL,
+    ProjectTitle VARCHAR(255) NOT NULL,
+    Description TEXT,
+    Grade INT,  -- Оценка за проект
+    DefenseDate DATE, -- Дата защиты
+    FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
+    FOREIGN KEY (SubjectID) REFERENCES Subjects(SubjectID),
+    FOREIGN KEY (TeacherID) REFERENCES Teachers(TeacherID)
+);
+
+222222222222222222222222222222222222222222222222.
+-- Создание базы данных
+CREATE DATABASE course_projects;
+
+-- Подключение к базе данных
+\c course_projects
+
+-- Таблица: Студенты (Students)
+CREATE TABLE Students (
+    StudentID SERIAL PRIMARY KEY,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    GroupID INT,  -- Ссылка на группу
+    FOREIGN KEY (GroupID) REFERENCES Groups(GroupID)
+);
+
+-- Таблица: Группы (Groups)
+CREATE TABLE Groups (
+    GroupID SERIAL PRIMARY KEY,
+    GroupName VARCHAR(50) NOT NULL,
+    Specialty VARCHAR(255)
+);
+
+-- Таблица: Преподаватели (Teachers)
+CREATE TABLE Teachers (
+    TeacherID SERIAL PRIMARY KEY,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    Department VARCHAR(255)
+);
+
+-- Таблица: Предметы (Subjects)
+CREATE TABLE Subjects (
+    SubjectID SERIAL PRIMARY KEY,
+    SubjectName VARCHAR(255) NOT NULL
+);
+
+-- Таблица: Курсовые проекты (CourseProjects)
+CREATE TABLE CourseProjects (
+    ProjectID SERIAL PRIMARY KEY,
+    StudentID INT NOT NULL,
+    SubjectID INT NOT NULL,
+    TeacherID INT NOT NULL,
+    ProjectTitle VARCHAR(255) NOT NULL,
+    Description TEXT,
+    Grade INT,  -- Оценка за проект
+    DefenseDate DATE, -- Дата защиты
+    FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
+    FOREIGN KEY (SubjectID) REFERENCES Subjects(SubjectID),
+    FOREIGN KEY (TeacherID) REFERENCES Teachers(TeacherID)
+);
+
+
+33333333333333333333333333333333333333333
+-- Заполнение таблицы Groups
+INSERT INTO Groups (GroupName, Specialty) VALUES
+('ПИ-21', 'Прикладная информатика'),
+('ЭК-22', 'Экономика');
+
+-- Заполнение таблицы Students
+INSERT INTO Students (FirstName, LastName, GroupID) VALUES
+('Иван', 'Иванов', 1),
+('Петр', 'Петров', 1),
+('Анна', 'Сидорова', 2),
+('Елена', 'Смирнова', 2);
+
+-- Заполнение таблицы Teachers
+INSERT INTO Teachers (FirstName, LastName, Department) VALUES
+('Сергей', 'Сергеев', 'Информационные технологии'),
+('Ольга', 'Ольгова', 'Экономика и финансы');
+
+-- Заполнение таблицы Subjects
+INSERT INTO Subjects (SubjectName) VALUES
+('Программирование'),
+('Базы данных'),
+('Экономическая теория'),
+('Финансовый анализ');
+
+-- Заполнение таблицы CourseProjects
+INSERT INTO CourseProjects (StudentID, SubjectID, TeacherID, ProjectTitle, Description, Grade, DefenseDate) VALUES
+(1, 1, 1, 'Разработка веб-приложения', 'Описание веб-приложения', 5, '2024-05-25'),
+(2, 2, 1, 'Проектирование базы данных', 'Описание структуры БД', 4, '2024-05-28'),
+(3, 3, 2, 'Анализ рынка ценных бумаг', 'Описание проведенного анализа', 5, '2024-06-01'),
+(4, 4, 2, 'Финансовое планирование предприятия', 'Описание финансового плана', 4, '2024-06-03');

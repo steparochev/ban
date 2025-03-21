@@ -1,0 +1,145 @@
+Билет №2
+1.	Разработать структуру базы данных сессионной успеваемости студентов в СУБД MySQL;
+2.	Разработать структуру базы данных сессионной успеваемости студентов в СУБД PostgreSQL;
+3.	Заполнить таблицы тестовым набором данных.
+
+
+
+11111111111111111111111111111111111111111111111111111111111111
+-- Создание базы данных
+CREATE DATABASE IF NOT EXISTS student_session_grades;
+
+-- Использование базы данных
+USE student_session_grades;
+
+-- Таблица: Студенты (Students)
+CREATE TABLE Students (
+    StudentID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    DateOfBirth DATE,
+    GroupID INT  -- Ссылка на группу
+);
+
+-- Таблица: Группы (Groups)
+CREATE TABLE Groups (
+    GroupID INT PRIMARY KEY AUTO_INCREMENT,
+    GroupName VARCHAR(50) NOT NULL,
+    Specialty VARCHAR(255)  -- Специальность
+);
+
+-- Таблица: Предметы (Subjects)
+CREATE TABLE Subjects (
+    SubjectID INT PRIMARY KEY AUTO_INCREMENT,
+    SubjectName VARCHAR(255) NOT NULL
+);
+
+-- Таблица: Сессии (Sessions)
+CREATE TABLE Sessions (
+    SessionID INT PRIMARY KEY AUTO_INCREMENT,
+    SessionName VARCHAR(50) NOT NULL,  -- Например, "Осенний семестр 2023"
+    StartDate DATE,
+    EndDate DATE
+);
+
+-- Таблица: Оценки (Grades)
+CREATE TABLE Grades (
+    GradeID INT PRIMARY KEY AUTO_INCREMENT,
+    StudentID INT NOT NULL,
+    SubjectID INT NOT NULL,
+    SessionID INT NOT NULL,
+    Grade INT,  -- Оценка (например, 2-5)
+    ExamDate DATE, -- Дата экзамена
+    FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
+    FOREIGN KEY (SubjectID) REFERENCES Subjects(SubjectID),
+    FOREIGN KEY (SessionID) REFERENCES Sessions(SessionID)
+);
+
+-- Добавление внешнего ключа в Students после создания таблицы Groups
+ALTER TABLE Students ADD FOREIGN KEY (GroupID) REFERENCES Groups(GroupID);
+
+22222222222222222222222222222222222222.
+-- Создание базы данных
+CREATE DATABASE student_session_grades;
+
+-- Подключение к базе данных
+\c student_session_grades
+
+-- Таблица: Студенты (Students)
+CREATE TABLE Students (
+    StudentID SERIAL PRIMARY KEY,
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    DateOfBirth DATE,
+    GroupID INT  -- Ссылка на группу
+);
+
+-- Таблица: Группы (Groups)
+CREATE TABLE Groups (
+    GroupID SERIAL PRIMARY KEY,
+    GroupName VARCHAR(50) NOT NULL,
+    Specialty VARCHAR(255)  -- Специальность
+);
+
+-- Таблица: Предметы (Subjects)
+CREATE TABLE Subjects (
+    SubjectID SERIAL PRIMARY KEY,
+    SubjectName VARCHAR(255) NOT NULL
+);
+
+-- Таблица: Сессии (Sessions)
+CREATE TABLE Sessions (
+    SessionID SERIAL PRIMARY KEY,
+    SessionName VARCHAR(50) NOT NULL,  -- Например, "Осенний семестр 2023"
+    StartDate DATE,
+    EndDate DATE
+);
+
+-- Таблица: Оценки (Grades)
+CREATE TABLE Grades (
+    GradeID SERIAL PRIMARY KEY,
+    StudentID INT NOT NULL,
+    SubjectID INT NOT NULL,
+    SessionID INT NOT NULL,
+    Grade INT,  -- Оценка (например, 2-5)
+    ExamDate DATE, -- Дата экзамена
+    FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
+    FOREIGN KEY (SubjectID) REFERENCES Subjects(SubjectID),
+    FOREIGN KEY (SessionID) REFERENCES Sessions(SessionID)
+);
+
+-- Добавление внешнего ключа в Students после создания таблицы Groups
+ALTER TABLE Students ADD FOREIGN KEY (GroupID) REFERENCES Groups(GroupID);
+
+33333333333333333333333333333333333333333333333
+-- Заполнение таблицы Groups
+INSERT INTO Groups (GroupName, Specialty) VALUES
+('Группа 1', 'Информационные технологии'),
+('Группа 2', 'Экономика');
+
+-- Заполнение таблицы Students
+INSERT INTO Students (FirstName, LastName, DateOfBirth, GroupID) VALUES
+('Иван', 'Иванов', '2000-01-15', 1),
+('Петр', 'Петров', '2001-03-20', 1),
+('Анна', 'Сидорова', '2000-07-10', 2),
+('Елена', 'Смирнова', '2001-11-05', 2);
+
+-- Заполнение таблицы Subjects
+INSERT INTO Subjects (SubjectName) VALUES
+('Математика'),
+('Информатика'),
+('Экономика'),
+('Английский язык');
+
+-- Заполнение таблицы Sessions
+INSERT INTO Sessions (SessionName, StartDate, EndDate) VALUES
+('Осенний семестр 2023', '2023-09-01', '2023-12-31'),
+('Весенний семестр 2024', '2024-02-01', '2024-05-31');
+
+-- Заполнение таблицы Grades
+INSERT INTO Grades (StudentID, SubjectID, SessionID, Grade, ExamDate) VALUES
+(1, 1, 1, 4, '2023-12-20'),
+(1, 2, 1, 5, '2023-12-22'),
+(2, 1, 1, 3, '2023-12-20'),
+(3, 3, 1, 4, '2023-12-25'),
+(4, 4, 1, 5, '2023-12-28');
